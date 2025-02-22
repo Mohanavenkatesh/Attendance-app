@@ -10,8 +10,8 @@ import AddAdmission from './components/AddAdmission';
 import Login from './components/Login';
 import Register from './components/Register';
 import Startingpage from './components/Startingpage';
-import './App.css';
 import Dashboard from './components/Dashboard';
+import './App.css';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,12 +24,12 @@ const App = () => {
   }, []);
 
   return (
-    <Router>
+    <Router basename={process.env.PUBLIC_URL}>
       <div className="app">
         {isAuthenticated && <Sidebar setIsAuthenticated={setIsAuthenticated} />}
         <div className="main-content">
           <Routes>
-            <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Startingpage />} />
+            <Route path="/" element={<Startingpage />} />
             <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
             <Route path="/courses" element={isAuthenticated ? <Courses /> : <Navigate to="/login" />} />
             <Route path="/attendances" element={isAuthenticated ? <Attendances /> : <Navigate to="/login" />} />
@@ -38,7 +38,7 @@ const App = () => {
             <Route path="/add-admission" element={isAuthenticated ? <AddAdmission /> : <Navigate to="/login" />} />
             <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard></Dashboard>} />
+            <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
           </Routes>
         </div>
       </div>
