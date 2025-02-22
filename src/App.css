@@ -1,0 +1,42 @@
+.app {
+    display: flex;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #f4f4f4;
+    padding: 20px;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .sidebar-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .sidebar-list li {
+    margin: 10px 0;
+  }
+  
+  .sidebar-list li a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .sidebar-list li button {
+    background: none;
+    border: none;
+    color: black;
+    cursor: pointer;
+  }
+  
+  .sidebar-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
