@@ -6,6 +6,24 @@ const Courses = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [editingAdmission, setEditingAdmission] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    mobile: '',
+    qualification: '',
+    parentName: '',
+    parentMobile: '',
+    address: '',
+    modeOfLearning: '',
+    preferredSlot: '',
+    placement: '',
+    attendBy: '',
+    course: ''
+  });
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchAdmissions = async () => {
@@ -36,45 +54,157 @@ const Courses = () => {
 
   const groupedAdmissions = groupByCourse(admissions);
 
+  const handleEdit = (admission) => {
+    setEditingAdmission(admission._id);
+    setFormData(admission);
+  };
+
+  const handleDelete = async (admissionId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/admissions/${admissionId}`);
+      const updatedAdmissions = admissions.filter(admission => admission._id !== admissionId);
+      setAdmissions(updatedAdmissions);
+      setSuccessMessage('Admission deleted successfully!');
+      setErrorMessage('');
+      if (updatedAdmissions.length === 0) {
+        setSelectedCourse(null);
+      }
+    } catch (error) {
+      console.error('Error deleting admission:', error);
+      setErrorMessage('Error deleting admission');
+      setSuccessMessage('');
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`http://localhost:5000/api/admissions/${editingAdmission}`, formData);
+      const updatedAdmissions = await axios.get('http://localhost:5000/api/admissions');
+      setAdmissions(updatedAdmissions.data);
+      setEditingAdmission(null);
+      setSuccessMessage('Admission updated successfully!');
+      setErrorMessage('');
+    } catch (error) {
+      console.error('Error updating admission:', error);
+      setErrorMessage('Error updating admission');
+      setSuccessMessage('');
+    }
+  };
+
   if (loading) {
-    return <div className="p-6 bg-gray-900 text-white rounded-md">Loading...</div>;
+    return <div className="alert alert-info">Loading...</div>;
   }
 
   if (error) {
-    return <div className="p-6 bg-gray-900 text-white rounded-md">{error}</div>;
+    return <div className="alert alert-danger">{error}</div>;
   }
 
+  // Use a fixed, light theme.
+  const containerClass = "container mt-5";
+  const cardClass = "card bg-light shadow-sm";
+  const btnClass = "btn btn-dark";
+
   return (
-    <div className="p-6 bg-gray-900 text-white rounded-md">
-      <h2 className="text-2xl mb-4">Admissions</h2>
+    <div className={containerClass}>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="text-center">Admissions</h2>
+      </div>
+
+      {/* Success or Error messages */}
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+
       {selectedCourse ? (
         <div>
-          <button onClick={() => setSelectedCourse(null)} className="mb-4 p-2 bg-purple-500 rounded text-white">Back to Courses</button>
-          <h3 className="text-xl mb-2">{selectedCourse}</h3>
-          <div className="grid grid-cols-1 gap-4">
-            {groupedAdmissions[selectedCourse].map((admission) => (
-              <div key={admission._id} className="p-4 bg-gray-800 rounded">
-                <h4 className="text-lg">{admission.name}</h4>
-                <p>Email: {admission.email}</p>
-                <p>Mobile: {admission.mobile}</p>
-                <p>Qualification: {admission.qualification}</p>
-                <p>Parent Name: {admission.parentName}</p>
-                <p>Parent Mobile: {admission.parentMobile}</p>
-                <p>Address: {admission.address}</p>
-                <p>Mode of Learning: {admission.modeOfLearning}</p>
-                <p>Preferred Slot: {admission.preferredSlot}</p>
-                <p>Placement: {admission.placement}</p>
-                <p>Attend By: {admission.attendBy}</p>
-              </div>
-            ))}
-          </div>
+          <button onClick={() => setSelectedCourse(null)} className={`btn ${btnClass} mb-4`}>
+            Back to Courses
+          </button>
+          <h3 className="text-center mb-3">{selectedCourse}</h3>
+
+          {groupedAdmissions[selectedCourse] && groupedAdmissions[selectedCourse].length > 0 ? (
+            <div className="row">
+              {groupedAdmissions[selectedCourse].map((admission) => (
+                <div key={admission._id} className="col-md-4 mb-4">
+                  <div className={cardClass}>
+                    <div className="card-body">
+                      {editingAdmission === admission._id ? (
+                        <form onSubmit={handleUpdate}>
+                          {Object.keys(formData).map((key) => (
+                            key !== 'course' ? (
+                              <div className="form-group" key={key}>
+                                <label>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                                <input
+                                  type="text"
+                                  name={key}
+                                  value={formData[key]}
+                                  onChange={handleChange}
+                                  className="form-control"
+                                  required
+                                />
+                              </div>
+                            ) : (
+                              <div className="form-group" key={key}>
+                                <label>Course</label>
+                                <select
+                                  name="course"
+                                  value={formData.course}
+                                  onChange={handleChange}
+                                  className="form-control"
+                                  required
+                                >
+                                  <option value="">Select course</option>
+                                  <option value="Fullstack Development">Fullstack Development</option>
+                                  <option value="UI/UX">UI/UX</option>
+                                  <option value="Graphics Design">Graphics Design</option>
+                                  <option value="Creator Course">Creator Course</option>
+                                  <option value="Digital Marketing">Digital Marketing</option>
+                                  <option value="Web Design">Web Design</option>
+                                  <option value="Video Editing">Video Editing</option>
+                                  <option value="Machine Learning">Machine Learning</option>
+                                  <option value="App Development">App Development</option>
+                                </select>
+                              </div>
+                            )
+                          ))}
+                          <button type="submit" className="btn btn-warning mt-3">Update</button>
+                        </form>
+                      ) : (
+                        <>
+                          <h5>{admission.name}</h5>
+                          <ul className="list-unstyled">
+                            {['name', 'mobile', 'email', 'qualification', 'parentName', 'parentMobile', 'address', 'modeOfLearning', 'preferredSlot', 'placement', 'attendBy'].map((key) => (
+                              <li key={key}>
+                                <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {admission[key]}
+                              </li>
+                            ))}
+                          </ul>
+                          <button onClick={() => handleEdit(admission)} className="btn btn-primary mt-2">Edit</button>
+                          <button onClick={() => handleDelete(admission._id)} className="btn btn-danger mt-2 ml-2">Delete</button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center">No admissions available for this course.</p>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="row">
           {Object.keys(groupedAdmissions).map((course) => (
-            <div key={course} className="p-4 bg-gray-800 rounded cursor-pointer" onClick={() => setSelectedCourse(course)}>
-              <h3 className="text-xl">{course}</h3>
-              <div className="text-sm text-gray-400">Count: {groupedAdmissions[course].length}</div>
+            <div key={course} className="col-md-4 mb-4">
+              <div className={cardClass} onClick={() => setSelectedCourse(course)} style={{ cursor: 'pointer' }}>
+                <div className="card-body">
+                  <h5 className="card-title">{course}</h5>
+                </div>
+              </div>
             </div>
           ))}
         </div>

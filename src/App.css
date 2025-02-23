@@ -1,3 +1,65 @@
+/* ===== Theme ===== */
+
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --sidebar-background-color: #f8f9fa;
+  --sidebar-text-color: #000000;
+}
+
+[data-theme='dark'] {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --sidebar-background-color: #343a40;
+  --sidebar-text-color: #ffffff;
+}
+
+[data-theme='light'] {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --sidebar-background-color: #f8f9fa;
+  --sidebar-text-color: #000000;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.sidebar {
+  background-color: var(--sidebar-background-color);
+  color: var(--sidebar-text-color);
+}
+
+.sidebar .nav-link {
+  color: var(--sidebar-text-color);
+}
+
+.sidebar .nav-link.active {
+  background-color: var(--sidebar-text-color);
+  color: var(--sidebar-background-color);
+}
+
+
+
+
+/* Dashboard upcoming class scrol ba hide css */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+
+
+
+
 .app {
     display: flex;
   }

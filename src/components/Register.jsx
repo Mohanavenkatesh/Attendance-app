@@ -73,9 +73,9 @@ const Register = () => {
     <div className="register-container d-flex flex-column align-items-center justify-content-center vh-100 position-relative">
       {/* Navbar */}
       <nav className="navbar navbar-light w-100 px-4 position-absolute top-0 start-0 d-flex justify-content-between">
-        <a className="navbar-brand fw-bold" href="#">PRESENTSIR</a>
+        <a className=" fw-bold" href="#">PRESENTSIR</a>
         <div>
-          <Link to='/Login'><button className="btn btn-outline-dark me-2">Login</button></Link>
+          <Link to='/Login'><button className="btn btn-light btn-outline-dark me-2">Login</button></Link>
           <Link to='/Register'><button className="btn btn-primary">Register</button></Link>
         </div>
       </nav>

@@ -22,7 +22,13 @@ const Login = ({ setIsAuthenticated }) => {
                 rememberMe: true
             });
         }
-    }, []);
+
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            setIsAuthenticated(true);
+            navigate('/dashboard'); // Redirect to dashboard if already authenticated
+        }
+    }, [setIsAuthenticated, navigate]);
 
     // Handle input change
     const handleChange = (e) => {
@@ -67,7 +73,7 @@ const Login = ({ setIsAuthenticated }) => {
         <div className="login-container d-flex flex-column align-items-center vh-100">
             {/* Navbar */}
             <nav className="navbar navbar-light w-100 px-4">
-                <a className="navbar-brand fw-bold" href="#">PRESENTSIR</a>
+                <a className=" fw-bold" href="#">PRESENTSIR</a>
                 <div>
                     <Link to='/Login'><button className="btn btn-light me-2">Login</button></Link>
                     <Link to='/Register'><button className="btn btn-primary">Register</button></Link>
@@ -80,7 +86,7 @@ const Login = ({ setIsAuthenticated }) => {
                     <div className="hands-left"></div>
                     <div className="hands-right"></div>
                     <div>
-                        <div className="card p-4 shadow bg-white text-center" style={{ width: '100%', maxWidth: '500px' }}>
+                        <div className="card p-4 shadow  text-center" style={{ width: '100%', maxWidth: '500px' }}>
                             <h2 className="mb-3">Sign in to your account</h2>
 
                             {/* Error Message */}

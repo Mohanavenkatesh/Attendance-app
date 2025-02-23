@@ -11,6 +11,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Startingpage from './components/Startingpage';
 import Dashboard from './components/Dashboard';
+import Help from './components/Help'; // Imported Help component
+import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
 const App = () => {
@@ -24,25 +26,29 @@ const App = () => {
   }, []);
 
   return (
-    <Router basename={process.env.PUBLIC_URL}>
-      <div className="app">
-        {isAuthenticated && <Sidebar setIsAuthenticated={setIsAuthenticated} />}
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Startingpage />} />
-            <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
-            <Route path="/courses" element={isAuthenticated ? <Courses /> : <Navigate to="/login" />} />
-            <Route path="/attendances" element={isAuthenticated ? <Attendances /> : <Navigate to="/login" />} />
-            <Route path="/report" element={isAuthenticated ? <Report /> : <Navigate to="/login" />} />
-            <Route path="/calendar" element={isAuthenticated ? <Calendar /> : <Navigate to="/login" />} />
-            <Route path="/add-admission" element={isAuthenticated ? <AddAdmission /> : <Navigate to="/login" />} />
-            <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
-          </Routes>
+    <ThemeProvider>
+      <Router basename={process.env.PUBLIC_URL}>
+        <div className="app">
+          {isAuthenticated && <Sidebar setIsAuthenticated={setIsAuthenticated} />}
+          <div className={`main-content ${isAuthenticated ? 'with-sidebar' : ''}`}>
+            <Routes>
+              <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Startingpage />} />
+              <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
+              <Route path="/courses" element={isAuthenticated ? <Courses /> : <Navigate to="/login" />} />
+              <Route path="/attendances" element={isAuthenticated ? <Attendances /> : <Navigate to="/login" />} />
+              {/* Updated Report route with an optional studentId parameter */}
+              <Route path="/report/:studentId?" element={isAuthenticated ? <Report /> : <Navigate to="/login" />} />
+              <Route path="/calendar" element={isAuthenticated ? <Calendar /> : <Navigate to="/login" />} />
+              <Route path="/add-admission" element={isAuthenticated ? <AddAdmission /> : <Navigate to="/login" />} />
+              <Route path="/help" element={<Help />} /> {/* Help route added */}
+              <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </ThemeProvider>
   );
 };
 
