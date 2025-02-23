@@ -30,42 +30,40 @@ const Dashboard = () => {
   ];
 
   // Search state for student names.
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   // Selected student for detailed report.
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  // Reference to the vertical scrolling container.
+  // Reference to the vertical scrolling containers.
   const scrollContainerRef = useRef(null);
+  const leaderboardScrollRef = useRef(null);
 
-  // Fetch Admissions
+  const fetchAdmissions = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/admissions');
+      setAdmissions(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching admissions data:', err);
+      setError('Error fetching admissions data');
+      setLoading(false);
+    }
+  };
+
+  const fetchAttendance = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/attendance');
+      setAttendance(response.data);
+      setAttendanceLoading(false);
+    } catch (err) {
+      console.error('Error fetching attendance:', err);
+      setAttendanceError('Error fetching attendance data');
+      setAttendanceLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAdmissions = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/admissions');
-        setAdmissions(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching admissions data:', err);
-        setError('Error fetching admissions data');
-        setLoading(false);
-      }
-    };
     fetchAdmissions();
-  }, []);
-
-  // Fetch Attendance Records
-  useEffect(() => {
-    const fetchAttendance = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/attendance');
-        setAttendance(response.data);
-        setAttendanceLoading(false);
-      } catch (err) {
-        console.error('Error fetching attendance:', err);
-        setAttendanceError('Error fetching attendance data');
-        setAttendanceLoading(false);
-      }
-    };
     fetchAttendance();
   }, []);
 
@@ -162,16 +160,21 @@ const Dashboard = () => {
     ],
   };
 
-  // Weekly Attendance Summary.
-  const startOfWeek = moment().startOf('week');
-  const daysOfWeek = [];
-  for (let i = 0; i < 7; i++) {
-    daysOfWeek.push(moment(startOfWeek).add(i, 'days'));
-  }
+  // Weekly Attendance Summary
+  const startOfWeek = moment().startOf('isoWeek');
+  const endOfWeek = moment().endOf('isoWeek');
   const weekAttendance = attendance.filter((att) => {
     const attDate = moment(att.date);
-    return attDate.isBetween(startOfWeek, moment().endOf('week'), null, '[]');
+    return attDate.isBetween(startOfWeek, endOfWeek, null, '[]');
   });
+
+  const daysOfWeek = [];
+  const currentWeekDate = startOfWeek.clone();
+  while (currentWeekDate.isSameOrBefore(endOfWeek)) {
+    daysOfWeek.push(currentWeekDate.clone());
+    currentWeekDate.add(1, 'day');
+  }
+
   const weeklyData = daysOfWeek.map((day) => {
     const dayStr = day.format('YYYY-MM-DD');
     const recordsForDay = weekAttendance.filter(
@@ -195,11 +198,12 @@ const Dashboard = () => {
       (status) => status === 'Absent'
     ).length;
     return {
-      day: day.format('ddd'),
+      day: day.format('ddd'), // Display day of the week (e.g., Mon, Tue, etc.)
       present: dayPresentCount,
       absent: dayAbsentCount,
     };
   });
+
   const barData = {
     labels: weeklyData.map((d) => d.day),
     datasets: [
@@ -216,10 +220,19 @@ const Dashboard = () => {
     ],
   };
 
-  // Leaderboard: Compute weekly attendance ranking for students based on 'Present' records.
+  // Leaderboard: Compute monthly attendance ranking for students based on 'Present' records.
+  const startOfMonth = moment().startOf('month'); // Start of the current month
+  const endOfMonth = moment().endOf('month'); // End of the current month
+
   const leaderboard = {};
-  weekAttendance.forEach(record => {
-    if (record.studentId && record.studentId._id && record.status === 'Present') {
+  attendance.forEach(record => {
+    const recordDate = moment(record.date);
+    if (
+      record.studentId &&
+      record.studentId._id &&
+      record.status === 'Present' &&
+      recordDate.isBetween(startOfMonth, endOfMonth, null, '[]') // Check if the record is within the current month
+    ) {
       const id = record.studentId._id;
       if (!leaderboard[id]) {
         leaderboard[id] = { name: record.studentId.name || 'Unknown', count: 0 };
@@ -227,7 +240,24 @@ const Dashboard = () => {
       leaderboard[id].count += 1;
     }
   });
+
   const leaderboardArray = Object.values(leaderboard).sort((a, b) => b.count - a.count);
+
+  // Vertical Auto-scroll effect for attendance leaderboard.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (leaderboardScrollRef.current) {
+        leaderboardScrollRef.current.scrollTop += 1;
+        if (
+          leaderboardScrollRef.current.scrollTop >=
+          leaderboardScrollRef.current.scrollHeight - leaderboardScrollRef.current.clientHeight
+        ) {
+          leaderboardScrollRef.current.scrollTop = 0;
+        }
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, [leaderboardArray]);
 
   // Filter admissions based on search term (by student name).
   const filteredAdmissions = admissions.filter(admission =>
@@ -295,118 +325,94 @@ const Dashboard = () => {
                   <div className="card shadow-sm">
                     <div className="card-body">
                       <h5>{admission.name}</h5>
-                      <p className="mb-0">
-                        <small>{admission.course}</small>
-                      </p>
+                      <p>{admission.course}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p>No students found.</p>
+            <div>No results found.</div>
           )}
         </div>
       )}
 
-      {/* Default Dashboard View */}
-      {!searchTerm && (
-        <>
-          {/* Courses Row (Admissions Cards) */}
-          <div className="row mb-4 justify-content-center">
-            {Object.keys(groupedAdmissions).map((course) => (
-              <div key={course} className="col-md-4 mb-4">
-                <div className="card shadow-sm">
-                  <div className="card-body">
-                    <h5 className="card-title">{course}</h5>
-                    <p className="card-text">Admissions: {groupedAdmissions[course].length}</p>
-                  </div>
-                </div>
+      {/* Admissions Data by Course (Count Only) */}
+      <div className="row mb-4">
+        {['Fullstack Development', 'UI/UX', 'Creator Course'].map((course) => (
+          <div className="col-md-4 mb-3" key={course}>
+            <div className="card shadow-sm">
+              <div className="card-body">
+                <h5 className="text-center">{course}</h5>
+                <p className="text-center">{groupedAdmissions[course] ? groupedAdmissions[course].length : 0} Admissions</p>
               </div>
-            ))}
+            </div>
           </div>
+        ))}
+      </div>
 
-          {/* Three-column Summary Row */}
-          <div className="row mb-4 justify-content-center align-items-center">
-            {/* Today's Attendance Summary */}
-            <div className="col-md-4">
-              <h5 className="text-center">Today's Attendance Summary</h5>
-              {attendanceLoading ? (
-                <div>Loading Attendance...</div>
-              ) : attendanceError ? (
-                <div className="alert alert-danger">{attendanceError}</div>
-              ) : (
-                <>
-                  <Pie data={pieData} options={{ maintainAspectRatio: true, responsive: true }} />
-                  <div className="text-center mt-2">
-                    <p>Present: {presentCount} | Absent: {absentCount}</p>
-                  </div>
-                </>
-              )}
-            </div>
+      {/* 3-Column Layout for Today's Attendance, Weekly Summary, and Upcoming Classes */}
+      <div className="row mb-4">
+        <div className="col-md-4">
+          <h5 className="text-center">Today's Attendance</h5>
+          <div className="p-2" style={{ height: '300px' }}>
+            <Pie data={pieData} options={{ maintainAspectRatio: true, responsive: true }} />
+          </div>
+        </div>
 
-            {/* Weekly Attendance Summary */}
-            <div className="col-md-4">
-              <h5 className="text-center">Weekly Attendance Summary</h5>
-              <div className="p-2">
-                <Bar data={barData} options={{ maintainAspectRatio: true, responsive: true }} />
-              </div>
-              <div className="text-center mt-2">
-                <p>
-                  Week: {startOfWeek.format('MMM D')} - {moment().endOf('week').format('MMM D')}
-                </p>
-              </div>
-            </div>
+        <div className="col-md-4">
+          <h5 className="text-center">Weekly Attendance Summary</h5>
+          <div className="p-2">
+            <Bar data={barData} options={{ maintainAspectRatio: true, responsive: true }} />
+          </div>
+          <div className="text-center mt-2">
+            <p>Week: {moment().startOf('isoWeek').format('MMM D')} - {moment().endOf('isoWeek').format('MMM D')}</p>
+          </div>
+        </div>
 
-            {/* Upcoming Classes with Vertical Auto-Scrolling */}
-            <div className="col-md-4">
-              <h5 className="text-center">Upcoming Classes</h5>
-              <div
-                ref={scrollContainerRef}
-                className="overflow-auto hide-scrollbar"
-                style={{ height: '250px', border: '1px solid #ddd', padding: '5px' }}
-              >
-                {sortedClassesByBatch.length ? (
-                  sortedClassesByBatch.map((cls) => (
-                    <div
-                      key={cls.id || cls._id}
-                      className="card mb-2"
-                      style={{ width: '100%' }}
-                    >
-                      <div className="card-body">
-                        <strong>{cls.title}</strong>
-                        <br />
-                        <small className="text-muted">
-                          {moment(cls.date).format('MMM D, YYYY h:mm A')}
-                        </small>
-                      </div>
+        <div className="col-md-4">
+          <h5 className="text-center">Upcoming Classes</h5>
+          <div
+            className="card shadow-sm"
+            ref={scrollContainerRef}
+            style={{ height: '300px', overflow: 'hidden' }} // Updated style to remove scrollbar
+          >
+            <ul className="list-group list-group-flush">
+              {[...sortedClassesByBatch, ...sortedClassesByBatch].map((cls, index) => (
+                <li key={index} className="list-group-item">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6>{cls.title}</h6>
+                      <p className="mb-0">Batch: {cls.batch}</p>
                     </div>
-                  ))
-                ) : (
-                  <p>No upcoming classes.</p>
-                )}
-              </div>
-            </div>
+                    <span className="badge badge-primary">{moment(cls.date).format('MMM D, YYYY')}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
+        </div>
+      </div>
 
-          {/* Attendance Leaderboard */}
-          <div className="mt-5">
-            <h3 className="text-center">Attendance Leaderboard</h3>
-            {leaderboardArray.length > 0 ? (
-              <ul className="list-group">
-                {leaderboardArray.map((entry, index) => (
-                  <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                    <span>{index + 1}. {entry.name}</span>
-                    <span>{entry.count} days</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-center">No leaderboard data available.</p>
-            )}
+      {/* Attendance Leaderboard */}
+      <div className="row mb-4 justify-content-center">
+        <div className="col-md-12">
+          <h5 className="text-center">Attendance Leaderboard</h5>
+          <div
+            className="card shadow-sm"
+            ref={leaderboardScrollRef}
+            style={{ height: '300px', overflow: 'hidden' }} // Updated style to remove scrollbar
+          >
+            <ul className="list-group list-group-flush">
+              {[...leaderboardArray, ...leaderboardArray].map((student, index) => (
+                <li key={index} className="list-group-item">
+                  <strong>{index % leaderboardArray.length + 1}. {student.name}</strong> - {student.count} Present
+                </li>
+              ))}
+            </ul>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

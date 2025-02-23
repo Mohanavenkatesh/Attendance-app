@@ -57,9 +57,17 @@ body {
 }
 
 
+/* Report calander  color  */
 
+.present {
+  background-color: green !important;
+  color: white !important;
+}
 
-
+.absent {
+  background-color: red !important;
+  color: white !important;
+}
 .app {
     display: flex;
   }

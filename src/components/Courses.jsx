@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import moment from 'moment';
 
 const Courses = () => {
   const [admissions, setAdmissions] = useState([]);
@@ -19,11 +22,15 @@ const Courses = () => {
     preferredSlot: '',
     placement: '',
     attendBy: '',
-    course: ''
+    course: '',
+    batch: '', // Add batch field
+    date: new Date(), // Add date field
   });
 
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [batches, setBatches] = useState([]);
 
   useEffect(() => {
     const fetchAdmissions = async () => {
@@ -38,7 +45,21 @@ const Courses = () => {
       }
     };
 
+    const fetchBatches = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/admissions'); // Replace with your API endpoint
+        const data = response.data;
+
+        // Extract distinct batches for the dropdown filters
+        const batchList = Array.from(new Set(data.map(student => student.batch).filter(Boolean)));
+        setBatches(batchList);
+      } catch (error) {
+        console.error('Error fetching batches:', error);
+      }
+    };
+
     fetchAdmissions();
+    fetchBatches();
   }, []);
 
   const groupByCourse = (admissions) => {
@@ -96,6 +117,17 @@ const Courses = () => {
     }
   };
 
+  const handleMonthChange = (date) => {
+    setSelectedMonth(date);
+  };
+
+  const filteredAdmissions = admissions.filter(admission => {
+    const admissionDate = moment(admission.date);
+    return admissionDate.isSame(selectedMonth, 'month');
+  });
+
+  const groupedFilteredAdmissions = groupByCourse(filteredAdmissions);
+
   if (loading) {
     return <div className="alert alert-info">Loading...</div>;
   }
@@ -113,6 +145,13 @@ const Courses = () => {
     <div className={containerClass}>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="text-center">Admissions</h2>
+        <DatePicker
+          selected={selectedMonth}
+          onChange={handleMonthChange}
+          dateFormat="MM/yyyy"
+          showMonthYearPicker
+          className="form-control"
+        />
       </div>
 
       {/* Success or Error messages */}
@@ -126,16 +165,16 @@ const Courses = () => {
           </button>
           <h3 className="text-center mb-3">{selectedCourse}</h3>
 
-          {groupedAdmissions[selectedCourse] && groupedAdmissions[selectedCourse].length > 0 ? (
+          {groupedFilteredAdmissions[selectedCourse] && groupedFilteredAdmissions[selectedCourse].length > 0 ? (
             <div className="row">
-              {groupedAdmissions[selectedCourse].map((admission) => (
+              {groupedFilteredAdmissions[selectedCourse].map((admission) => (
                 <div key={admission._id} className="col-md-4 mb-4">
                   <div className={cardClass}>
                     <div className="card-body">
                       {editingAdmission === admission._id ? (
                         <form onSubmit={handleUpdate}>
                           {Object.keys(formData).map((key) => (
-                            key !== 'course' ? (
+                            key !== 'course' && key !== 'batch' ? (
                               <div className="form-group" key={key}>
                                 <label>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
                                 <input
@@ -147,7 +186,7 @@ const Courses = () => {
                                   required
                                 />
                               </div>
-                            ) : (
+                            ) : key === 'course' ? (
                               <div className="form-group" key={key}>
                                 <label>Course</label>
                                 <select
@@ -169,6 +208,22 @@ const Courses = () => {
                                   <option value="App Development">App Development</option>
                                 </select>
                               </div>
+                            ) : (
+                              <div className="form-group" key={key}>
+                                <label>Batch</label>
+                                <select
+                                  name="batch"
+                                  value={formData.batch}
+                                  onChange={handleChange}
+                                  className="form-control"
+                                  required
+                                >
+                                  <option value="">Select batch</option>
+                                  {batches.map((batch, index) => (
+                                    <option key={index} value={batch}>{batch}</option>
+                                  ))}
+                                </select>
+                              </div>
                             )
                           ))}
                           <button type="submit" className="btn btn-warning mt-3">Update</button>
@@ -177,11 +232,15 @@ const Courses = () => {
                         <>
                           <h5>{admission.name}</h5>
                           <ul className="list-unstyled">
-                            {['name', 'mobile', 'email', 'qualification', 'parentName', 'parentMobile', 'address', 'modeOfLearning', 'preferredSlot', 'placement', 'attendBy'].map((key) => (
+                            {['name', 'mobile', 'email', 'qualification', 'parentName', 'parentMobile', 'address', 'modeOfLearning', 'preferredSlot', 'placement', 'attendBy', 'batch', 'date'].map((key) => (
                               <li key={key}>
                                 <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {admission[key]}
                               </li>
                             ))}
+                            <li>
+                              <strong>Date:</strong> {moment(admission.date).format('DD/MM/YYYY')}<br />
+                              <strong>Time:</strong> {moment(admission.date).format('hh:mm A')}
+                            </li>
                           </ul>
                           <button onClick={() => handleEdit(admission)} className="btn btn-primary mt-2">Edit</button>
                           <button onClick={() => handleDelete(admission._id)} className="btn btn-danger mt-2 ml-2">Delete</button>
@@ -198,7 +257,7 @@ const Courses = () => {
         </div>
       ) : (
         <div className="row">
-          {Object.keys(groupedAdmissions).map((course) => (
+          {Object.keys(groupedFilteredAdmissions).map((course) => (
             <div key={course} className="col-md-4 mb-4">
               <div className={cardClass} onClick={() => setSelectedCourse(course)} style={{ cursor: 'pointer' }}>
                 <div className="card-body">

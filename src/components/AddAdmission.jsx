@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AddAdmission = () => {
   const initialFormData = {
@@ -16,6 +18,7 @@ const AddAdmission = () => {
     batch: "",
     placement: "",
     attendBy: "",
+    date: new Date(), // Add date field
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -27,15 +30,21 @@ const AddAdmission = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleDateChange = (date) => {
+    setFormData({ ...formData, date });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admission", formData);
+      const response = await axios.post("http://localhost:5000/api/admission", formData);
       setSuccessMessage("Admission submitted successfully!");
       setErrorMessage("");
       setFormData(initialFormData);
     } catch (error) {
-      setErrorMessage("Error submitting admission form.");
+      setErrorMessage(
+        error.response?.data?.message || "Error submitting admission form."
+      );
       setSuccessMessage("");
     }
   };
@@ -106,12 +115,13 @@ const AddAdmission = () => {
             </div>
             <div className="col-md-6">
               <input
-                type="text"
+                type="tel"
                 name="mobile"
                 placeholder="Enter student mobile no"
                 value={formData.mobile}
                 onChange={handleChange}
                 className="form-control"
+                pattern="[0-9]{10}"
                 required
               />
             </div>
@@ -150,12 +160,13 @@ const AddAdmission = () => {
             </div>
             <div className="col-md-6">
               <input
-                type="text"
+                type="tel"
                 name="parentMobile"
                 placeholder="Enter student parent's mobile no"
                 value={formData.parentMobile}
                 onChange={handleChange}
                 className="form-control"
+                pattern="[0-9]{10}"
                 required
               />
             </div>
@@ -245,6 +256,16 @@ const AddAdmission = () => {
                 <option value="self">Self</option>
                 <option value="guardian">Guardian</option>
               </select>
+            </div>
+            <div className="col-md-6">
+              <label htmlFor="date" className="form-label">Select Date:</label>
+              <DatePicker
+                selected={formData.date}
+                onChange={handleDateChange}
+                dateFormat="dd/MM/yyyy"
+                className="form-control"
+                required
+              />
             </div>
           </div>
           <div className="text-center mt-4">

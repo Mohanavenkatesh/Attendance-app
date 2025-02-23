@@ -1,236 +1,289 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useParams } from 'react-router-dom';
-import { Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import moment from 'moment';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import { Pie } from 'react-chartjs-2';
+import 'chart.js/auto';
+import { Accordion, Card, Button, useAccordionButton } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
-
-// StudentDetail: shows a student's attendance with accurate present/absent counts and a pie chart.
-const StudentDetail = () => {
-  const { studentId } = useParams();
-  const [attendanceRecords, setAttendanceRecords] = useState([]);
+const Report = () => {
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('All');
+  const [selectedBatch, setSelectedBatch] = useState('All');
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // YYYY-MM-DD
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [attendanceStatus, setAttendanceStatus] = useState({});
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(moment().format('YYYY-MM')); // YYYY-MM
+
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/admissions'); // Adjust endpoint as needed
+      const data = response.data;
+      setStudents(data);
+      setFilteredStudents(data);
+      setLoading(false);
+
+      // Extract distinct courses and batches for the dropdown filters
+      const courseList = Array.from(new Set(data.map(student => student.course).filter(Boolean)));
+      const batchList = Array.from(new Set(data.map(student => student.batch).filter(Boolean)));
+      setCourses(courseList);
+      setBatches(batchList);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      setError('Error fetching students');
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStudentAttendance = async () => {
+    fetchStudents();
+  }, []);
+
+  // Update filtered students when selected course or batch changes
+  useEffect(() => {
+    let filtered = students;
+
+    if (selectedCourse !== 'All') {
+      filtered = filtered.filter(student => student.course === selectedCourse);
+    }
+
+    if (selectedBatch !== 'All') {
+      filtered = filtered.filter(student => student.batch === selectedBatch);
+    }
+
+    setFilteredStudents(filtered);
+  }, [selectedCourse, selectedBatch, students]);
+
+  useEffect(() => {
+    const fetchAttendance = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/attendance?studentId=${studentId}`);
-        setAttendanceRecords(response.data);
-        setLoading(false);
+        const response = await axios.get('http://localhost:5000/api/attendance');
+        const attendanceRecords = response.data;
+
+        const statusObj = attendanceRecords.reduce((acc, record) => {
+          if (record.studentId && record.studentId._id) {
+            const id = record.studentId._id;
+            const date = moment(record.date).format('YYYY-MM-DD');
+            if (!acc[id]) {
+              acc[id] = {};
+            }
+            acc[id][date] = record.status;
+          }
+          return acc;
+        }, {});
+        setAttendanceStatus(statusObj);
       } catch (err) {
-        console.error('Error fetching student attendance:', err);
-        setError('Error fetching student attendance');
-        setLoading(false);
+        console.error('Error fetching attendance:', err);
       }
     };
 
-    fetchStudentAttendance();
-  }, [studentId]);
+    fetchAttendance();
+  }, []);
 
-  if (loading) {
-    return <div className="container mt-4">Loading...</div>;
-  }
-  if (error) {
-    return <div className="container mt-4 text-danger">{error}</div>;
-  }
+  const calculateAttendanceCounts = () => {
+    let presentCount = 0;
+    let absentCount = 0;
 
-  // Group attendance records by local day using Moment.js.
-  // For each day, if any record is "Present", mark that day as Present.
-  const groupedByDay = attendanceRecords.reduce((acc, record) => {
-    const day = moment(record.date).format('YYYY-MM-DD');
-    if (!acc[day]) {
-      acc[day] = record.status;
-    } else {
-      if (acc[day] === 'Absent' && record.status === 'Present') {
-        acc[day] = 'Present';
+    filteredStudents.forEach(student => {
+      if (attendanceStatus[student._id]) {
+        Object.values(attendanceStatus[student._id]).forEach(status => {
+          if (status === 'Present') {
+            presentCount++;
+          } else if (status === 'Absent') {
+            absentCount++;
+          }
+        });
+      }
+    });
+
+    return { presentCount, absentCount };
+  };
+
+  const calculateStudentAttendanceCounts = (studentId, month) => {
+    let presentCount = 0;
+    let absentCount = 0;
+
+    if (attendanceStatus[studentId]) {
+      Object.entries(attendanceStatus[studentId]).forEach(([date, status]) => {
+        if (moment(date).format('YYYY-MM') === month) {
+          if (status === 'Present') {
+            presentCount++;
+          } else if (status === 'Absent') {
+            absentCount++;
+          }
+        }
+      });
+    }
+
+    const totalDays = presentCount + absentCount;
+    const presentPercentage = totalDays > 0 ? ((presentCount / totalDays) * 100).toFixed(2) : 0;
+    const absentPercentage = totalDays > 0 ? ((absentCount / totalDays) * 100).toFixed(2) : 0;
+
+    return { presentCount, absentCount, presentPercentage, absentPercentage };
+  };
+
+  const { presentCount, absentCount } = calculateAttendanceCounts();
+
+  if (loading) return <div className="container mt-4">Loading...</div>;
+  if (error) return <div className="container mt-4 text-danger">{error}</div>;
+
+  const markAttendance = async (studentId, status) => {
+    try {
+      const attendanceData = { studentId, date: new Date(selectedDate), status };
+      await axios.post('http://localhost:5000/api/attendance', attendanceData);
+      setMessage(`Attendance marked as ${status} on ${selectedDate}`);
+      setAttendanceStatus(prev => ({
+        ...prev,
+        [studentId]: {
+          ...prev[studentId],
+          [moment(selectedDate).format('YYYY-MM-DD')]: status,
+        },
+      }));
+    } catch (error) {
+      console.error('Error marking attendance:', error);
+      setMessage('Error marking attendance');
+    }
+  };
+
+  const getTileClassName = ({ date, view }, studentId) => {
+    if (view === 'month') {
+      const dateString = moment(date).format('YYYY-MM-DD');
+      if (attendanceStatus[studentId] && attendanceStatus[studentId][dateString]) {
+        return attendanceStatus[studentId][dateString] === 'Present' ? 'present' : 'absent';
       }
     }
-    return acc;
-  }, {});
+    return null;
+  };
 
-  const uniqueAttendances = Object.values(groupedByDay);
-  const presentCount = uniqueAttendances.filter(status => status === 'Present').length;
-  const absentCount = uniqueAttendances.filter(status => status === 'Absent').length;
+  const handleActiveStartDateChange = ({ activeStartDate }) => {
+    setSelectedMonth(moment(activeStartDate).format('YYYY-MM'));
+  };
 
-  const pieData = {
-    labels: ['Present', 'Absent'],
-    datasets: [
-      {
-        data: [presentCount, absentCount],
-        backgroundColor: ['#28a745', '#dc3545'],
-        hoverBackgroundColor: ['#218838', '#c82333'],
-        borderWidth: 1,
-      },
-    ],
+  const renderPieChart = (studentId, month) => {
+    const { presentCount, absentCount } = calculateStudentAttendanceCounts(studentId, month);
+    const data = {
+      labels: ['Present', 'Absent'],
+      datasets: [
+        {
+          data: [presentCount, absentCount],
+          backgroundColor: ['#28a745', '#dc3545'],
+        },
+      ],
+    };
+
+    return <Pie data={data} />;
   };
 
   return (
     <div className="container mt-4">
-      <h2>Student Attendance Details</h2>
-      {attendanceRecords.length > 0 ? (
-        <div className="mb-3">
-          <h4>{attendanceRecords[0]?.studentId?.name}</h4>
+      <h2>Mark Attendance</h2>
+      {message && <div className="alert alert-info">{message}</div>}
+
+      <div className="row mb-3">
+        <div className="col-md-3">
+          <label htmlFor="dateFilter" className="form-label"><strong>Select Date:</strong></label>
+          <input
+            type="date"
+            id="dateFilter"
+            className="form-control"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+        </div>
+        <div className="col-md-3">
+          <label htmlFor="courseFilter" className="form-label"><strong>Filter by Course:</strong></label>
+          <select
+            id="courseFilter"
+            className="form-select"
+            value={selectedCourse}
+            onChange={(e) => setSelectedCourse(e.target.value)}
+          >
+            <option value="All">All</option>
+            {courses.map((course, index) => (
+              <option key={index} value={course}>{course}</option>
+            ))}
+          </select>
+        </div>
+        <div className="col-md-3">
+          <label htmlFor="batchFilter" className="form-label"><strong>Filter by Batch:</strong></label>
+          <select
+            id="batchFilter"
+            className="form-select"
+            value={selectedBatch}
+            onChange={(e) => setSelectedBatch(e.target.value)}
+          >
+            <option value="All">All</option>
+            {batches.map((batch, index) => (
+              <option key={index} value={batch}>{batch}</option>
+            ))}
+          </select>
+        </div>
+        <div className="col-md-3">
+          <h4>Summary for {selectedDate}:</h4>
           <p>
-            <strong>Present:</strong> {presentCount} day(s) &nbsp;&nbsp;
-            <strong>Absent:</strong> {absentCount} day(s)
+            <span className="badge bg-success me-2">Present: {presentCount}</span>
+            <span className="badge bg-danger">Absent: {absentCount}</span>
           </p>
         </div>
-      ) : (
-        <div className="mb-3">
-          <h4>No attendance record available</h4>
-        </div>
-      )}
-      <div className="mb-4">
-        <h4>Attendance Summary (Pie Chart)</h4>
-        <Pie data={pieData} />
       </div>
-      <div className="mt-3">
-        <Link to="/report" className="btn btn-secondary">
-          Back to Student List
-        </Link>
-      </div>
+
+      <Accordion>
+        {filteredStudents.map((student, index) => (
+          <Card key={student._id}>
+            <Card.Header>
+              <CustomToggle eventKey={index.toString()} onClick={() => setSelectedStudent(student._id)}>
+                {student.name}
+              </CustomToggle>
+            </Card.Header>
+            <Accordion.Collapse eventKey={index.toString()}>
+              <Card.Body>
+                <div className="row">
+                  <div className="col-md-4">
+                    <div className="calendar-container">
+                      <Calendar
+                        tileClassName={({ date, view }) => getTileClassName({ date, view }, student._id)}
+                        onActiveStartDateChange={handleActiveStartDateChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <h5>Attendance Summary for {student.name} ({selectedMonth}):</h5>
+                    <p>
+                      <span className="badge bg-success me-2">Present: {calculateStudentAttendanceCounts(student._id, selectedMonth).presentCount}</span>
+                      <span className="badge bg-danger me-2">Absent: {calculateStudentAttendanceCounts(student._id, selectedMonth).absentCount}</span>
+                      <span className="badge bg-info">Present: {calculateStudentAttendanceCounts(student._id, selectedMonth).presentPercentage}%</span>
+                      <span className="badge bg-warning">Absent: {calculateStudentAttendanceCounts(student._id, selectedMonth).absentPercentage}%</span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    {renderPieChart(student._id, selectedMonth)}
+                  </div>
+                </div>
+              </Card.Body>
+            </Accordion.Collapse>
+          </Card>
+        ))}
+      </Accordion>
     </div>
   );
 };
 
-// StudentList: displays a filtered list of students based on selected course and attendance records for a selected date.
-const StudentList = () => {
-  const [attendances, setAttendances] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
-  const [selectedCourse, setSelectedCourse] = useState('All');
-  const [courses, setCourses] = useState([]);
-
-  // Fetch all attendance records.
-  useEffect(() => {
-    const fetchAttendances = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/attendance');
-        setAttendances(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching attendance:', err);
-        setError('Error fetching attendance');
-        setLoading(false);
-      }
-    };
-
-    fetchAttendances();
-  }, []);
-
-  // Extract distinct courses from attendance records.
-  useEffect(() => {
-    const courseSet = new Set();
-    attendances.forEach(att => {
-      if (att.studentId && att.studentId.course) {
-        courseSet.add(att.studentId.course);
-      }
-    });
-    setCourses([...courseSet]);
-  }, [attendances]);
-
-  if (loading) {
-    return <div className="container mt-4">Loading...</div>;
-  }
-  if (error) {
-    return <div className="container mt-4 text-danger">{error}</div>;
-  }
-
-  // Filter attendance records by selected date (using Moment.js).
-  const filteredAttendances = attendances.filter(att => {
-    const attDate = moment(att.date).format('YYYY-MM-DD');
-    return attDate === selectedDate;
-  });
-
-  // Group filtered records by studentId *and* by date (to count unique dates).
-  let grouped = filteredAttendances.reduce((acc, att) => {
-    if (!att.studentId || !att.studentId._id) return acc;
-    const id = att.studentId._id;
-    const day = moment(att.date).format('YYYY-MM-DD');
-    if (!acc[id]) {
-      acc[id] = { student: att.studentId, records: {} };
-    }
-    // The last record for a given day will override, which is enough to count unique days.
-    acc[id].records[day] = att.status;
-    return acc;
-  }, {});
-
-  let groupedArray = Object.values(grouped);
-
-  // Filter grouped records by course if needed.
-  if (selectedCourse !== 'All') {
-    groupedArray = groupedArray.filter(({ student }) => student.course === selectedCourse);
-  }
+function CustomToggle({ children, eventKey, onClick }) {
+  const decoratedOnClick = useAccordionButton(eventKey, onClick);
 
   return (
-    <div className="container mt-4">
-      <h2>Attendance Report</h2>
-
-      {/* Date Filter */}
-      <div className="mb-3">
-        <label htmlFor="dateFilter" className="form-label">
-          <strong>Select Date:</strong>
-        </label>
-        <input
-          type="date"
-          id="dateFilter"
-          className="form-control"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-      </div>
-
-      {/* Filter by Course */}
-      <div className="mb-3">
-        <label htmlFor="courseFilter" className="form-label">
-          <strong>Filter by Course:</strong>
-        </label>
-        <select
-          id="courseFilter"
-          className="form-select"
-          value={selectedCourse}
-          onChange={(e) => setSelectedCourse(e.target.value)}
-        >
-          <option value="All">All</option>
-          {courses.map((course, index) => (
-            <option key={index} value={course}>
-              {course}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Student List */}
-      <ul className="list-group">
-        {groupedArray.map(({ student, records }) => {
-          const recordCount = Object.keys(records).length;
-          return (
-            <li key={student._id} className="list-group-item d-flex justify-content-between align-items-center">
-              <div>
-                <Link to={`/report/${student._id}`}>
-                  <strong>{student.name}</strong>
-                </Link>
-                {student.course && <span className="ms-2 badge bg-secondary">{student.course}</span>}
-              </div>
-              <span className="badge bg-info">
-                {recordCount} record{recordCount !== 1 ? 's' : ''}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <Button variant="link" onClick={decoratedOnClick}>
+      {children}
+    </Button>
   );
-};
-
-// Main Report component: shows StudentDetail if a studentId parameter is present; otherwise shows StudentList.
-const Report = () => {
-  const { studentId } = useParams();
-  return studentId ? <StudentDetail /> : <StudentList />;
-};
+}
 
 export default Report;
