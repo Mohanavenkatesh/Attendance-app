@@ -1,26 +1,63 @@
 /* ===== Theme ===== */
+/* App.css */
 
+/* Define CSS variables for light and dark themes */
 :root {
   --background-color: #ffffff;
   --text-color: #000000;
   --sidebar-background-color: #f8f9fa;
   --sidebar-text-color: #000000;
+  --card-background-color: #ffffff;
+  --card-text-color: #000000;
+  --input-background-color: #ffffff;
+  --input-text-color: #000000;
+  --input-placeholder-color: #666666; /* Placeholder color for light theme */
+  --button-background-color: #a45ee5;
+  --button-text-color: #ffffff;
 }
 
 [data-theme='dark'] {
-  --background-color: #121212;
+  --background-color: hsl(0, 0%, 4%);
   --text-color: #ffffff;
-  --sidebar-background-color: #343a40;
+  --sidebar-background-color: hsl(0, 0%, 3%);
   --sidebar-text-color: #ffffff;
+  --card-background-color: #111111;
+  --card-text-color: #ffffff;
+  --input-background-color: #000000;
+  --input-text-color: #ffffff;
+  --input-placeholder-color: #aaaaaa; /* Placeholder color for dark theme */
+  --button-background-color: #a45ee5;
+  --button-text-color: #ffffff;
 }
 
-[data-theme='light'] {
-  --background-color: #ffffff;
-  --text-color: #000000;
-  --sidebar-background-color: #f8f9fa;
-  --sidebar-text-color: #000000;
+/* ------------Present Sir Theme --------------- */
+
+.text-color {
+  color: #a45ee5;
 }
 
+.button-color {
+  background-color: #a45ee5;
+  color: #ffffff;
+}
+
+.button-color:hover {
+  color: #ffffff;
+  background-color: #CF9CFF;
+}
+
+.selected-component {
+  color: #ffffff;
+  background-color: #CF9CFF;
+  text-decoration: none;
+}
+
+.selected-component:hover {
+  color: #ffffff; /* Ensure text color remains white on hover */
+  background-color: #CF9CFF; /* Ensure background color remains the same on hover */
+}
+
+/* ------------Present Sir Theme End --------------- */
 body {
   background-color: var(--background-color);
   color: var(--text-color);
@@ -31,19 +68,42 @@ body {
   color: var(--sidebar-text-color);
 }
 
-.sidebar .nav-link {
+.sidebar-title {
+  font-size: 24px;
+
+}
+
+.nav-link {
   color: var(--sidebar-text-color);
+  text-decoration: none;
 }
 
-.sidebar .nav-link.active {
-  background-color: var(--sidebar-text-color);
-  color: var(--sidebar-background-color);
+.nav-link:hover {
+  color: var(--sidebar-text-color); /* Disable hover effect */
+  background-color: var(--sidebar-background-color); /* Disable hover effect */
 }
 
+.nav-link.selected-component {
+  color: #ffffff;
+  background-color: #CF9CFF;
+}
 
+button {
+  background-color: var(--button-background-color);
+  color: var(--button-text-color);
+}
 
+/* Additional styles for other components */
+.navbar, .list-group-item, .badge, .form-control, .form-select {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
 
-/* Dashboard upcoming class scrol ba hide css */
+.alert {
+  background-color: var(--card-background-color);
+  color: var(--card-text-color);
+}
+/* Dashboard upcoming class scroll bar hide css */
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .hide-scrollbar::-webkit-scrollbar {
@@ -56,8 +116,7 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
-
-/* Report calander  color  */
+/* Report calendar color */
 
 .present {
   background-color: green !important;
@@ -68,45 +127,427 @@ body {
   background-color: red !important;
   color: white !important;
 }
+
 .app {
-    display: flex;
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--sidebar-background-color);
+  padding: 20px;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.sidebar-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar-list li {
+  margin: 10px 0;
+}
+
+.sidebar-list li a {
+  text-decoration: none;
+  color: var(--sidebar-text-color);
+  font-weight: bold;
+}
+
+.sidebar-list li button {
+  background: none;
+  border: none;
+  color: var(--sidebar-text-color);
+  cursor: pointer;
+}
+
+.sidebar-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Placeholder text color for light and dark themes */
+::placeholder {
+  color: var(--input-placeholder-color);
+}
+
+[data-theme='dark'] ::placeholder {
+  color: #aaaaaa; /* Light gray color for dark theme */
+}
+
+[data-theme='light'] ::placeholder {
+  color: #666666; /* Dark gray color for light theme */
+}
+
+/* Report.css */
+
+/* Custom styles for the calendar component */
+.custom-calendar {
+  --calendar-background-color: var(--background-color);
+  --calendar-text-color: var(--text-color);
+  --calendar-border-color: var(--border-color);
+}
+
+.react-calendar {
+  background-color: var(--calendar-background-color);
+  color: var(--calendar-text-color);
+  border: 1px solid var(--calendar-border-color);
+}
+
+.react-calendar__tile {
+  background-color: var(--calendar-background-color);
+  color: var(--calendar-text-color);
+}
+
+.react-calendar__tile--active {
+  background-color: var(--primary-color);
+  color: var(--primary-text-color);
+}
+
+.react-calendar__tile--now {
+  background-color: var(--secondary-color);
+  color: var(--secondary-text-color);
+}
+
+.present {
+  background-color: green !important;
+  color: white !important;
+}
+
+.absent {
+  background-color: red !important;
+  color: white !important;
+}
+
+/* Calendar.css */
+
+/* Custom styles for the calendar component */
+.custom-calendar {
+  --calendar-background-color: var(--background-color);
+  --calendar-text-color: var(--text-color);
+  --calendar-border-color: var(--border-color);
+}
+
+.rbc-calendar {
+  background-color: var(--calendar-background-color);
+  color: var(--calendar-text-color);
+  border: 1px solid var(--calendar-border-color);
+}
+
+.rbc-event {
+  background-color: var(--primary-color);
+  color: var(--primary-text-color);
+}
+
+.rbc-toolbar {
+  background-color: var(--toolbar-background-color);
+  color: var(--toolbar-text-color);
+}
+
+.rbc-toolbar button {
+  background-color: var(--button-background-color);
+  color: var(--button-text-color);
+}
+
+.rbc-toolbar button:hover {
+  background-color: var(--button-hover-background-color);
+  color: var(--button-hover-text-color);
+}
+
+.rbc-day-bg {
+  background-color: var(--day-background-color);
+}
+
+.rbc-day-bg:hover {
+  background-color: var(--day-hover-background-color);
+}
+
+.rbc-today {
+  background-color: var(--today-background-color);
+  color: var(--today-text-color);
+}
+
+/* AddAdmission.css */
+
+/* Custom styles for the form component */
+.custom-form {
+  --form-background-color: var(--background-color);
+  --form-text-color: var(--text-color);
+  --form-border-color: var(--border-color);
+}
+
+.custom-form {
+  background-color: var(--form-background-color);
+  color: var(--form-text-color);
+  border: 1px solid var(--form-border-color);
+}
+
+.custom-form .form-control,
+.custom-form .form-select {
+  background-color: var(--input-background-color);
+  color: var(--input-text-color);
+  border: 1px solid var(--input-border-color);
+}
+
+.custom-form .form-control::placeholder {
+  color: var(--input-placeholder-color);
+}
+
+.custom-form .form-control:focus,
+.custom-form .form-select:focus {
+  border-color: var(--input-focus-border-color);
+  box-shadow: 0 0 0 0.2rem var(--input-focus-shadow-color);
+}
+
+.custom-form .btn-primary {
+  background-color: var(--button-background-color);
+  color: var(--button-text-color);
+  border: 1px solid var(--button-border-color);
+}
+
+.custom-form .btn-primary:hover {
+  background-color: var(--button-hover-background-color);
+  color: var(--button-hover-text-color);
+  border: 1px solid var(--button-hover-border-color);
+}
+
+/* Sidebar.css */
+
+/* Custom styles for the sidebar component */
+.sidebar-background-color {
+  background-color: var(--sidebar-background-color);
+}
+
+.sidebar-title {
+  color: var(--sidebar-title-color);
+}
+
+.sidebar-link {
+  color: var(--sidebar-link-color);
+}
+
+.sidebar-link:hover {
+  color: var(--sidebar-link-hover-color);
+}
+
+.sidebar-link.active {
+  color: var(--sidebar-link-active-color);
+}
+
+/* ================================================= */
+
+/* Dashboard upcoming class scroll bar hide css */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Report calendar color */
+
+.present {
+  background-color: green !important;
+  color: white !important;
+}
+
+.absent {
+  background-color: red !important;
+  color: white !important;
+}
+
+.app {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--sidebar-background-color);
+  padding: 20px;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.sidebar-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar-list li {
+  margin: 10px 0;
+}
+
+.sidebar-list li a {
+  text-decoration: none;
+  color: var(--sidebar-text-color);
+  font-weight: bold;
+}
+
+.sidebar-list li button {
+  background: none;
+  border: none;
+  color: var(--sidebar-text-color);
+  cursor: pointer;
+}
+
+.sidebar-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+
+
+/* Resister  */
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
   }
-  
-  .sidebar {
-    width: 250px;
-    background-color: #f4f4f4;
-    padding: 20px;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  
-  .main-content {
-    flex-grow: 1;
-    padding: 20px;
+}
+
+.modal.show.slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+
+/* Login */
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
   }
-  
-  .sidebar-list {
-    list-style-type: none;
-    padding: 0;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  
-  .sidebar-list li {
-    margin: 10px 0;
+}
+
+.modal.show.slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+
+/* Model */
+.modal-content {
+  background-color: var(--card-background-color);
+  color: var(--card-text-color);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--input-border-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--input-border-color);
+}
+
+.close {
+  color: var(--text-color);
+}
+
+.btn-secondary {
+  background-color: var(--button-background-color);
+  color: var(--button-text-color);
+  border: 1px solid var(--button-border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--button-hover-background-color);
+  color: var(--button-hover-text-color);
+  border: 1px solid var(--button-hover-border-color);
+}
+
+/* Animation for slide-down effect */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
   }
-  
-  .sidebar-list li a {
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  
-  .sidebar-list li button {
-    background: none;
-    border: none;
-    color: black;
-    cursor: pointer;
+}
+
+.modal.show.slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+
+/* Login */
+
+.modal-content {
+  background-color: var(--card-background-color);
+  color: var(--card-text-color);
+}
+
+.modal-body {
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Animation for slide-down effect */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
   }
-  
-  .sidebar-title {
-    font-size: 24px;
-    font-weight: bold;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  
+}
+
+.modal.show.slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+
+/* Register model */
+
+.modal-content {
+  background-color: var(--card-background-color);
+  color: var(--card-text-color);
+}
+
+.modal-body {
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Animation for slide-down effect */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal.show.slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+
+

@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { ThemeContext } from '../context/ThemeContext';
+import { Container, Row, Col, Card, ListGroup, Button, Badge, Form } from 'react-bootstrap';
 
 const Attendances = () => {
-  const { theme } = useContext(ThemeContext);
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -108,92 +107,106 @@ const Attendances = () => {
   };
 
   return (
-    <div className={`container mt-4 ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}>
-      <h2 className="text-center mb-4">Mark Attendance</h2>
-      {message && <div className="alert alert-info">{message}</div>}
+    <Container fluid>
+      <div className="shadow-sm mb-4">
+        
+          <h2 className="text-center mb-3">Mark Attendance</h2>
+          {message && <div className="alert alert-info">{message}</div>}
 
-      <div className="row mb-3">
-        <div className="col-md-4 d-flex flex-column">
-          <label htmlFor="dateFilter" className="form-label"><strong>Select Date:</strong></label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            dateFormat="dd/MM/yyyy"
-            className="form-control"
-          />
-        </div>
-        <div className="col-md-4 d-flex flex-column">
-          <label htmlFor="courseFilter" className="form-label"><strong>Filter by Course:</strong></label>
-          <select
-            id="courseFilter"
-            className="form-select"
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-          >
-            <option value="All">All</option>
-            {courses.map((course, index) => (
-              <option key={index} value={course}>{course}</option>
-            ))}
-          </select>
-        </div>
-        <div className="col-md-4 d-flex flex-column">
-          <label htmlFor="batchFilter" className="form-label"><strong>Filter by Batch:</strong></label>
-          <select
-            id="batchFilter"
-            className="form-select"
-            value={selectedBatch}
-            onChange={(e) => setSelectedBatch(e.target.value)}
-          >
-            <option value="All">All</option>
-            {batches.map((batch, index) => (
-              <option key={index} value={batch}>{batch}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="mb-3">
-        <h4>Summary for {moment(selectedDate).format('DD/MM/YYYY')}:</h4>
-        <p>
-          <span className="badge bg-success me-2">Present: {presentCount}</span>
-          <span className="badge bg-danger">Absent: {absentCount}</span>
-        </p>
-      </div>
-
-      <ul className="list-group">
-        {filteredStudents.map((student) => (
-          <li
-            key={student._id}
-            className={`list-group-item d-flex justify-content-between align-items-center ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}
-          >
-            <div>
-              <strong>{student.name}</strong> {student.course && <span className="ms-2 badge bg-secondary">{student.course}</span>}
-              {attendanceStatus[student._id] && (
-                <span
-                  className={`badge ms-2 ${attendanceStatus[student._id] === "Present" ? "bg-success" : "bg-danger"}`}
+          <Row className="g-3 mb-4">
+            <Col md={4}>
+              <Form.Group controlId="dateFilter">
+                <Form.Label><strong>Select Date:</strong></Form.Label>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  className="form-control"
+                  wrapperClassName="d-block"
+                />
+              </Form.Group>
+            </Col>
+            <Col md={4}>
+              <Form.Group controlId="courseFilter">
+                <Form.Label><strong>Filter by Course:</strong></Form.Label>
+                <Form.Select
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
                 >
-                  {attendanceStatus[student._id]}
-                </span>
-              )}
-            </div>
+                  <option value="All">All</option>
+                  {courses.map((course, index) => (
+                    <option key={index} value={course}>{course}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={4}>
+              <Form.Group controlId="batchFilter">
+                <Form.Label><strong>Filter by Batch:</strong></Form.Label>
+                <Form.Select
+                  value={selectedBatch}
+                  onChange={(e) => setSelectedBatch(e.target.value)}
+                >
+                  <option value="All">All</option>
+                  {batches.map((batch, index) => (
+                    <option key={index} value={batch}>{batch}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <div className="mb-4">
+            <h4>Summary for {moment(selectedDate).format('DD/MM/YYYY')}:</h4>
             <div>
-              <button
-                onClick={() => markAttendance(student._id, "Present")}
-                className="btn btn-success me-2 mb-2"
-              >
-                Present
-              </button>
-              <button
-                onClick={() => markAttendance(student._id, "Absent")}
-                className="btn btn-danger mb-2"
-              >
-                Absent
-              </button>
+              <Badge bg="success" className="me-2">Present: {presentCount}</Badge>
+              <Badge bg="danger">Absent: {absentCount}</Badge>
             </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+          </div>
+
+          <ListGroup>
+            {filteredStudents.map((student) => (
+              <ListGroup.Item key={student._id} className="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{student.name}</strong>
+                  {student.course && (
+                    <Badge bg="secondary" className="ms-2">
+                      {student.course}
+                    </Badge>
+                  )}
+                  {attendanceStatus[student._id] && (
+                    <Badge
+                      bg={attendanceStatus[student._id] === "Present" ? "success" : "danger"}
+                      className="ms-2"
+                    >
+                      {attendanceStatus[student._id]}
+                    </Badge>
+                  )}
+                </div>
+                <div>
+                  <Button
+                    variant="success"
+                    size="sm"
+                    className="me-2 mb-2"
+                    onClick={() => markAttendance(student._id, "Present")}
+                  >
+                    Present
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="mb-2"
+                    onClick={() => markAttendance(student._id, "Absent")}
+                  >
+                    Absent
+                  </Button>
+                </div>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+       
+      </div>
+    </Container>
   );
 };
 

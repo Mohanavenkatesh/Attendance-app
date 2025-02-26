@@ -3,6 +3,7 @@ import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment';
+import { Form } from 'react-bootstrap'; // Import Form component
 
 const Courses = () => {
   const [admissions, setAdmissions] = useState([]);
@@ -31,6 +32,7 @@ const Courses = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [batches, setBatches] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState('All');
 
   useEffect(() => {
     const fetchAdmissions = async () => {
@@ -38,6 +40,10 @@ const Courses = () => {
         const response = await axios.get('http://localhost:5000/api/admissions');
         setAdmissions(response.data);
         setLoading(false);
+
+        // Extract distinct batches for the dropdown filters
+        const batchList = Array.from(new Set(response.data.map(student => student.batch).filter(Boolean)));
+        setBatches(batchList);
       } catch (error) {
         console.error('Error fetching admissions:', error);
         setError('Error fetching admissions');
@@ -45,21 +51,7 @@ const Courses = () => {
       }
     };
 
-    const fetchBatches = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/admissions'); // Replace with your API endpoint
-        const data = response.data;
-
-        // Extract distinct batches for the dropdown filters
-        const batchList = Array.from(new Set(data.map(student => student.batch).filter(Boolean)));
-        setBatches(batchList);
-      } catch (error) {
-        console.error('Error fetching batches:', error);
-      }
-    };
-
     fetchAdmissions();
-    fetchBatches();
   }, []);
 
   const groupByCourse = (admissions) => {
@@ -123,7 +115,7 @@ const Courses = () => {
 
   const filteredAdmissions = admissions.filter(admission => {
     const admissionDate = moment(admission.date);
-    return admissionDate.isSame(selectedMonth, 'month');
+    return admissionDate.isSame(selectedMonth, 'month') && (selectedBatch === 'All' || admission.batch === selectedBatch);
   });
 
   const groupedFilteredAdmissions = groupByCourse(filteredAdmissions);
@@ -136,10 +128,10 @@ const Courses = () => {
     return <div className="alert alert-danger">{error}</div>;
   }
 
-  // Use a fixed, light theme.
+  // Use CSS variables for theme
   const containerClass = "container mt-5";
-  const cardClass = "card bg-light shadow-sm";
-  const btnClass = "btn btn-dark";
+  const cardClass = "card shadow-sm";
+  const btnClass = "btn";
 
   return (
     <div className={containerClass}>
@@ -151,7 +143,20 @@ const Courses = () => {
           dateFormat="MM/yyyy"
           showMonthYearPicker
           className="form-control"
+          style={{ backgroundColor: 'var(--input-background-color)', color: 'var(--input-text-color)' }}
         />
+        <Form.Group controlId="batchFilter" className="ms-3">
+          <Form.Label><strong>Filter by Batch:</strong></Form.Label>
+          <Form.Select
+            value={selectedBatch}
+            onChange={(e) => setSelectedBatch(e.target.value)}
+          >
+            <option value="All">All</option>
+            {batches.map((batch, index) => (
+              <option key={index} value={batch}>{batch}</option>
+            ))}
+          </Form.Select>
+        </Form.Group>
       </div>
 
       {/* Success or Error messages */}
@@ -160,7 +165,7 @@ const Courses = () => {
 
       {selectedCourse ? (
         <div>
-          <button onClick={() => setSelectedCourse(null)} className={`btn ${btnClass} mb-4`}>
+          <button onClick={() => setSelectedCourse(null)} className={`btn ${btnClass} mb-4`} style={{ backgroundColor: 'var(--button-background-color)', color: 'var(--button-text-color)' }}>
             Back to Courses
           </button>
           <h3 className="text-center mb-3">{selectedCourse}</h3>
@@ -169,7 +174,7 @@ const Courses = () => {
             <div className="row">
               {groupedFilteredAdmissions[selectedCourse].map((admission) => (
                 <div key={admission._id} className="col-md-4 mb-4">
-                  <div className={cardClass}>
+                  <div className={cardClass} style={{ backgroundColor: 'var(--card-background-color)', color: 'var(--card-text-color)' }}>
                     <div className="card-body">
                       {editingAdmission === admission._id ? (
                         <form onSubmit={handleUpdate}>
@@ -184,6 +189,7 @@ const Courses = () => {
                                   onChange={handleChange}
                                   className="form-control"
                                   required
+                                  style={{ backgroundColor: 'var(--input-background-color)', color: 'var(--input-text-color)' }}
                                 />
                               </div>
                             ) : key === 'course' ? (
@@ -195,6 +201,7 @@ const Courses = () => {
                                   onChange={handleChange}
                                   className="form-control"
                                   required
+                                  style={{ backgroundColor: 'var(--input-background-color)', color: 'var(--input-text-color)' }}
                                 >
                                   <option value="">Select course</option>
                                   <option value="Fullstack Development">Fullstack Development</option>
@@ -217,6 +224,7 @@ const Courses = () => {
                                   onChange={handleChange}
                                   className="form-control"
                                   required
+                                  style={{ backgroundColor: 'var(--input-background-color)', color: 'var(--input-text-color)' }}
                                 >
                                   <option value="">Select batch</option>
                                   {batches.map((batch, index) => (
@@ -259,8 +267,8 @@ const Courses = () => {
         <div className="row">
           {Object.keys(groupedFilteredAdmissions).map((course) => (
             <div key={course} className="col-md-4 mb-4">
-              <div className={cardClass} onClick={() => setSelectedCourse(course)} style={{ cursor: 'pointer' }}>
-                <div className="card-body">
+              <div className={cardClass} onClick={() => setSelectedCourse(course)} style={{ cursor: 'pointer', backgroundColor: 'var(--card-background-color)', color: 'var(--card-text-color)' }}>
+                <div className=" card-body ">
                   <h5 className="card-title">{course}</h5>
                 </div>
               </div>

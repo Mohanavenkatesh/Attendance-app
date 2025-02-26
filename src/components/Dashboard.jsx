@@ -3,38 +3,36 @@ import axios from 'axios';
 import moment from 'moment';
 import { Pie, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import '../css/Dashboard.css';
+import dashboard from '../img/dashboard.png'
+import profile from '../img/profile.png'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+
+//  // ----- Static Upcoming Classes Data (Removed API fetching) -----
+const upcomingClasses = [
+  { _id: "1", title: "Fullstack Development", date: "2025-02-28T09:30:00.000Z", batch: "9.30" },
+  { _id: "2", title: "UI/UX", date: "2025-02-28T10:30:00.000Z", batch: "10.30" },
+  { _id: "3", title: "Graphics Design", date: "2025-02-28T11:30:00.000Z", batch: "11.30" },
+  { _id: "4", title: "Creator Course", date: "2025-02-28T12:30:00.000Z", batch: "12.30" },
+  { _id: "5", title: "Digital Marketing", date: "2025-02-28T13:30:00.000Z", batch: "1.30" },
+  { _id: "6", title: "Web Design", date: "2025-02-28T14:30:00.000Z", batch: "2.30" },
+  { _id: "7", title: "Video Editing", date: "2025-02-28T15:30:00.000Z", batch: "3.30" },
+  { _id: "8", title: "Machine Learning", date: "2025-02-28T16:30:00.000Z", batch: "4.30" },
+  { _id: "9", title: "App Development", date: "2025-02-28T17:30:00.000Z", batch: "5.30" },
+];
 
 const Dashboard = () => {
   const [admissions, setAdmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  // State for attendance
   const [attendance, setAttendance] = useState([]);
   const [attendanceLoading, setAttendanceLoading] = useState(true);
   const [attendanceError, setAttendanceError] = useState('');
-
-  // ----- Static Upcoming Classes Data (Removed API fetching) -----
-  const upcomingClasses = [
-    { _id: "1", title: "Math", date: "2025-02-28T09:30:00.000Z", batch: "9.30" },
-    { _id: "2", title: "Physics", date: "2025-02-28T10:30:00.000Z", batch: "10.30" },
-    { _id: "3", title: "Chemistry", date: "2025-02-28T11:30:00.000Z", batch: "11.30" },
-    { _id: "4", title: "Biology", date: "2025-02-28T12:30:00.000Z", batch: "12.30" },
-    { _id: "5", title: "History", date: "2025-02-28T13:30:00.000Z", batch: "1.30" },
-    { _id: "6", title: "Geography", date: "2025-02-28T14:30:00.000Z", batch: "2.30" },
-    { _id: "7", title: "Art", date: "2025-02-28T15:30:00.000Z", batch: "3.30" },
-    { _id: "8", title: "Music", date: "2025-02-28T16:30:00.000Z", batch: "4.30" },
-    { _id: "9", title: "Physical Ed", date: "2025-02-28T17:30:00.000Z", batch: "5.30" },
-  ];
-
-  // Search state for student names.
   const [searchTerm, setSearchTerm] = useState('');
-  // Selected student for detailed report.
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false); // State for welcome popup
 
-  // Reference to the vertical scrolling containers.
   const scrollContainerRef = useRef(null);
   const leaderboardScrollRef = useRef(null);
 
@@ -65,6 +63,11 @@ const Dashboard = () => {
   useEffect(() => {
     fetchAdmissions();
     fetchAttendance();
+    setShowWelcomePopup(true); // Show the popup when the component mounts
+    const timer = setTimeout(() => {
+      setShowWelcomePopup(false); // Automatically close the popup after 2 seconds
+    }, 2000);
+    return () => clearTimeout(timer); // Cleanup the timer on unmount
   }, []);
 
   // Sort upcoming classes by date.
@@ -276,8 +279,8 @@ const Dashboard = () => {
           Back to Dashboard
         </button>
         <h2 className="mb-4 text-center">Student Detailed Report</h2>
-        <div className="card shadow-sm">
-          <div className="card-body">
+        <div className=" shadow-sm">
+          <div className="">
             <h4>{selectedStudent.name}</h4>
             <ul className="list-unstyled">
               {Object.keys(selectedStudent)
@@ -295,17 +298,19 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="container mt-5 position-relative">
-      <h2 className="mb-4 text-center">Dashboard</h2>
+    <div className="container  position-relative">
+
+      <h2 className="mb-4 text-start">Dashboard</h2>
 
       {/* Search Bar in Top-Right Corner */}
       <div style={{ position: 'absolute', top: '10px', right: '10px', width: '250px' }}>
         <input
           type="text"
-          className="form-control form-control-sm"
-          placeholder="Search student name..."
+          className="form-control form-control-sm rounded"
+          placeholder="Search"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ backgroundColor: 'var(--input-background-color)', color: 'var(--input-text-color)' }}
         />
       </div>
 
@@ -322,7 +327,7 @@ const Dashboard = () => {
                   onClick={() => setSelectedStudent(admission)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <div className="card shadow-sm">
+                  <div className="card shadow-sm" style={{ backgroundColor: 'var(--card-background-color)', color: 'var(--card-text-color)' }}>
                     <div className="card-body">
                       <h5>{admission.name}</h5>
                       <p>{admission.course}</p>
@@ -339,12 +344,13 @@ const Dashboard = () => {
 
       {/* Admissions Data by Course (Count Only) */}
       <div className="row mb-4">
+        <img src={dashboard} alt="" className='dashboard-img' />
         {['Fullstack Development', 'UI/UX', 'Creator Course'].map((course) => (
-          <div className="col-md-4 mb-3" key={course}>
-            <div className="card shadow-sm">
+          <div className="col-md-4  dashboard-cards" key={course}>
+            <div className="card shadow" style={{ backgroundColor: 'var(--card-background-color)', color: 'var(--card-text-color)' }}>
               <div className="card-body">
                 <h5 className="text-center">{course}</h5>
-                <p className="text-center">{groupedAdmissions[course] ? groupedAdmissions[course].length : 0} Admissions</p>
+                <p className="text-center">{groupedAdmissions[course] ? groupedAdmissions[course].length : 0} Students</p>
               </div>
             </div>
           </div>

@@ -1,139 +1,100 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Card, Accordion } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faUser, 
+  faUserClock, 
+  faFileAlt, 
+  faCog, 
+  faHeadphones 
+} from '@fortawesome/free-solid-svg-icons';
+
 
 const Help = () => {
+ 
   return (
-    <div className="container mt-5">
-      <div className="row">
-        <div className="col-md-8 offset-md-2">
-          <h2 className="text-center mb-4">Help & Support</h2>
-          <p className="text-center">
-            Find answers to frequently asked questions or contact our support team.
-          </p>
-          <img 
-            src="https://via.placeholder.com/800x300" 
-            alt="Help" 
-            className="img-fluid mb-4"
-          />
+    <div className="container " style={{ minHeight: '100vh' }}>
+      <h2 className="mb-4">Need help?</h2>
+      <div className="row row-cols-1 row-cols-md-3 g-4">
+        <Card className="shadow-sm border-0 rounded-3">
+          <Card.Body className="text-center p-4">
+            <FontAwesomeIcon icon={faUser} size="2x" className="mb-3 text-muted" />
+            <Card.Title>Get started</Card.Title> {/* Corrected closing tag */}
+            <Card.Text className="text-muted">
+              Generate insightful attendance reports with customizable date ranges and export options.
+            </Card.Text>
+          </Card.Body>
+        </Card>
+        <Card className="shadow-sm border-0 rounded-3">
+          <Card.Body className="text-center p-4">
+            <FontAwesomeIcon icon={faUserClock} size="2x" className="mb-3 text-muted" />
+            <Card.Title>Managing Attendance</Card.Title> {/* Corrected closing tag */}
+            <Card.Text className="text-muted">
+              Effortlessly track, update, and manage attendance with a user-friendly web app.
+            </Card.Text>
+          </Card.Body>
+        </Card>
+        <Card className="shadow-sm border-0 rounded-3">
+          <Card.Body className="text-center p-4">
+            <FontAwesomeIcon icon={faUser} size="2x" className="mb-3 text-muted" />
+            <Card.Title>User Management</Card.Title> {/* Corrected closing tag */}
+            <Card.Text className="text-muted">
+              Easily add, assign roles, and manage users for seamless access control.
+            </Card.Text>
+          </Card.Body>
+        </Card>
+        <Card className="shadow-sm border-0 rounded-3">
+          <Card.Body className="text-center p-4">
+            <FontAwesomeIcon icon={faFileAlt} size="2x" className="mb-3 text-muted" />
+            <Card.Title>Reporting</Card.Title> {/* Corrected closing tag */}
+            <Card.Text className="text-muted">
+              Generate insightful attendance reports with customizable date ranges and export options.
+            </Card.Text>
+          </Card.Body>
+        </Card>
+        <Card className="shadow-sm border-0 rounded-3">
+          <Card.Body className="text-center p-4">
+            <FontAwesomeIcon icon={faCog} size="2x" className="mb-3 text-muted" />
+            <Card.Title>Settings</Card.Title> {/* Corrected closing tag */}
+            <Card.Text className="text-muted">
+              Customize notifications, working hours, and preferences for a tailored experience.
+            </Card.Text>
+          </Card.Body>
+        </Card>
+        <Card className="shadow-sm border-0 rounded-3">
+          <Card.Body className="text-center p-4">
+            <FontAwesomeIcon icon={faHeadphones} size="2x" className="mb-3 text-muted" />
+            <Card.Title>Support</Card.Title> {/* Corrected closing tag */}
+            <Card.Text className="text-muted">
+              Access FAQs, live chat, and email support for quick assistance.
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </div>
 
-          <div className="row">
-            <div className="col-md-6 mb-4">
-              <div className="card">
-                <div className="card-header" id="faq1">
-                  <h5 className="mb-0">
-                    <button
-                      className="btn btn-link"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseFaq1"
-                      aria-expanded="true"
-                      aria-controls="collapseFaq1"
-                    >
-                      How do I create an admission?
-                    </button>
-                  </h5>
-                </div>
-                <div
-                  id="collapseFaq1"
-                  className="collapse show"
-                  aria-labelledby="faq1"
-                  data-bs-parent="#helpAccordion"
-                >
-                  <div className="card-body">
-                    You can create an admission by filling out the admission form and clicking "Submit Admission". Make sure all required fields are completed accurately.
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-6 mb-4">
-              <div className="card">
-                <div className="card-header" id="faq2">
-                  <h5 className="mb-0">
-                    <button
-                      className="btn btn-link collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseFaq2"
-                      aria-expanded="false"
-                      aria-controls="collapseFaq2"
-                    >
-                      How do I update or delete an admission?
-                    </button>
-                  </h5>
-                </div>
-                <div
-                  id="collapseFaq2"
-                  className="collapse"
-                  aria-labelledby="faq2"
-                  data-bs-parent="#helpAccordion"
-                >
-                  <div className="card-body">
-                    To update or delete an admission, please navigate to the dashboard, select the admission you wish to modify, and use the available update or delete options.
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-6 mb-4">
-              <div className="card">
-                <div className="card-header" id="faq3">
-                  <h5 className="mb-0">
-                    <button
-                      className="btn btn-link collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseFaq3"
-                      aria-expanded="false"
-                      aria-controls="collapseFaq3"
-                    >
-                      Who should I contact for support?
-                    </button>
-                  </h5>
-                </div>
-                <div
-                  id="collapseFaq3"
-                  className="collapse"
-                  aria-labelledby="faq3"
-                  data-bs-parent="#helpAccordion"
-                >
-                  <div className="card-body">
-                    For assistance, please contact our support team at <a href="mailto:support@example.com">support@example.com</a> or call +1 234 567 890.
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-6 mb-4">
-              <div className="card">
-                <div className="card-header" id="faq4">
-                  <h5 className="mb-0">
-                    <button
-                      className="btn btn-link collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseFaq4"
-                      aria-expanded="false"
-                      aria-controls="collapseFaq4"
-                    >
-                      How do I reset my password?
-                    </button>
-                  </h5>
-                </div>
-                <div
-                  id="collapseFaq4"
-                  className="collapse"
-                  aria-labelledby="faq4"
-                  data-bs-parent="#helpAccordion"
-                >
-                  <div className="card-body">
-                    To reset your password, click on the "Forgot Password" link on the login page and follow the instructions.
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
+      {/* FAQs Section */}
+      <div className="mt-5">
+        <h3>FAQs</h3>
+        <Accordion className="mt-3">
+          <Accordion.Item eventKey="0" className="shadow-sm border-0 rounded-3">
+            <Accordion.Header>Can I export attendance data?</Accordion.Header>
+            <Accordion.Body>
+              Yes, you can export attendance data in various formats like CSV or PDF with customizable date ranges.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1" className="shadow-sm border-0 rounded-3">
+            <Accordion.Header>What roles can be assigned to users?</Accordion.Header>
+            <Accordion.Body>
+              Users can be assigned roles such as Admin, Manager, or Viewer, depending on their responsibilities.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="2" className="shadow-sm border-0 rounded-3">
+            <Accordion.Header>How do I edit an attendance record?</Accordion.Header>
+            <Accordion.Body>
+              Navigate to the Attendances section, select the record, and click the edit button to update details.
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
       </div>
     </div>
   );

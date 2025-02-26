@@ -8,6 +8,7 @@ import 'chart.js/auto';
 import { Accordion, Card, Button, useAccordionButton } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
 const Report = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -251,6 +252,7 @@ const Report = () => {
                       <Calendar
                         tileClassName={({ date, view }) => getTileClassName({ date, view }, student._id)}
                         onActiveStartDateChange={handleActiveStartDateChange}
+                        className="custom-calendar" // Add custom class for styling
                       />
                     </div>
                   </div>
