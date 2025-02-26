@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import profile from "../img/Profil.png";
+
 const Sidebar = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
@@ -64,76 +66,76 @@ const Sidebar = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <div className="d-flex flex-column p-3 sidebar" style={{ width: '250px', height: '100vh' }}>
-      <h3 className="sidebar-title">PresentSir</h3>
+    <div className="d-flex flex-column gap-3 p-3 sidebar" style={{ width: '250px', height: '100vh' }}>
+    <img src={profile} alt="" />
       <ul className="nav nav-pills flex-column mb-auto">
         <li className="nav-item">
-          <Link 
-            to="/dashboard" 
-            className={`nav-link ${selected === 'dashboard' ? 'selected-component' : ''}`} 
+          <Link
+            to="/dashboard"
+            className={`nav-link ${selected === 'dashboard' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('dashboard')}
           >
             Dashboard
           </Link>
         </li>
         <li className="nav-item">
-          <Link 
-            to="/courses" 
-            className={`nav-link ${selected === 'courses' ? 'selected-component' : ''}`} 
+          <Link
+            to="/courses"
+            className={`nav-link ${selected === 'courses' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('courses')}
           >
             Courses
           </Link>
         </li>
         <li className="nav-item">
-          <Link 
-            to="/attendances" 
-            className={`nav-link ${selected === 'attendances' ? 'selected-component' : ''}`} 
+          <Link
+            to="/attendances"
+            className={`nav-link ${selected === 'attendances' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('attendances')}
           >
             Attendances
           </Link>
         </li>
         <li className="nav-item">
-          <Link 
-            to="/report" 
-            className={`nav-link ${selected === 'report' ? 'selected-component' : ''}`} 
+          <Link
+            to="/report"
+            className={`nav-link ${selected === 'report' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('report')}
           >
             Report
           </Link>
         </li>
         <li className="nav-item">
-          <Link 
-            to="/calendar" 
-            className={`nav-link ${selected === 'calendar' ? 'selected-component' : ''}`} 
+          <Link
+            to="/calendar"
+            className={`nav-link ${selected === 'calendar' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('calendar')}
           >
             Calendar
           </Link>
         </li>
         <li className="nav-item">
-          <Link 
-            to="/add-admission" 
-            className={`nav-link ${selected === 'add-admission' ? 'selected-component' : ''}`} 
+          <Link
+            to="/add-admission"
+            className={`nav-link ${selected === 'add-admission' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('add-admission')}
           >
             Add Admission
           </Link>
         </li>
         <li className="nav-item">
-          <Link 
-            to="/settings" 
-            className={`nav-link ${selected === 'settings' ? 'selected-component' : ''}`} 
+          <Link
+            to="/settings"
+            className={`nav-link ${selected === 'settings' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('settings')}
           >
             Settings
           </Link>
         </li>
         <li className="nav-item">
-          <Link 
-            to="/help" 
-            className={`nav-link ${selected === 'help' ? 'selected-component' : ''}`} 
+          <Link
+            to="/help"
+            className={`nav-link ${selected === 'help' ? 'selected-component' : ''}`}
             onClick={() => handleSelect('help')}
           >
             Help

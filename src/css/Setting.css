@@ -1,0 +1,15 @@
+.theme-selection {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .theme-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .theme-img {
+    margin-bottom: 10px;
+  }

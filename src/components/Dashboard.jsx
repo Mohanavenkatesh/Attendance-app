@@ -3,24 +3,23 @@ import axios from 'axios';
 import moment from 'moment';
 import { Pie, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
-import '../css/Dashboard.css';
+import  '../css/Dashboard.css';
 import dashboard from '../img/dashboard.png'
-import profile from '../img/profile.png'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-//  // ----- Static Upcoming Classes Data (Removed API fetching) -----
-const upcomingClasses = [
-  { _id: "1", title: "Fullstack Development", date: "2025-02-28T09:30:00.000Z", batch: "9.30" },
-  { _id: "2", title: "UI/UX", date: "2025-02-28T10:30:00.000Z", batch: "10.30" },
-  { _id: "3", title: "Graphics Design", date: "2025-02-28T11:30:00.000Z", batch: "11.30" },
-  { _id: "4", title: "Creator Course", date: "2025-02-28T12:30:00.000Z", batch: "12.30" },
-  { _id: "5", title: "Digital Marketing", date: "2025-02-28T13:30:00.000Z", batch: "1.30" },
-  { _id: "6", title: "Web Design", date: "2025-02-28T14:30:00.000Z", batch: "2.30" },
-  { _id: "7", title: "Video Editing", date: "2025-02-28T15:30:00.000Z", batch: "3.30" },
-  { _id: "8", title: "Machine Learning", date: "2025-02-28T16:30:00.000Z", batch: "4.30" },
-  { _id: "9", title: "App Development", date: "2025-02-28T17:30:00.000Z", batch: "5.30" },
-];
+  //  // ----- Static Upcoming Classes Data (Removed API fetching) -----
+  const upcomingClasses = [
+    { _id: "1", title: "Fullstack Development", date: "2025-02-28T09:30:00.000Z", batch: "9.30" },
+    { _id: "2", title: "UI/UX", date: "2025-02-28T10:30:00.000Z", batch: "10.30" },
+    { _id: "3", title: "Graphics Design", date: "2025-02-28T11:30:00.000Z", batch: "11.30" },
+    { _id: "4", title: "Creator Course", date: "2025-02-28T12:30:00.000Z", batch: "12.30" },
+    { _id: "5", title: "Digital Marketing", date: "2025-02-28T13:30:00.000Z", batch: "1.30" },
+    { _id: "6", title: "Web Design", date: "2025-02-28T14:30:00.000Z", batch: "2.30" },
+    { _id: "7", title: "Video Editing", date: "2025-02-28T15:30:00.000Z", batch: "3.30" },
+    { _id: "8", title: "Machine Learning", date: "2025-02-28T16:30:00.000Z", batch: "4.30" },
+    { _id: "9", title: "App Development", date: "2025-02-28T17:30:00.000Z", batch: "5.30" },
+  ];
 
 const Dashboard = () => {
   const [admissions, setAdmissions] = useState([]);
@@ -299,6 +298,28 @@ const Dashboard = () => {
 
   return (
     <div className="container  position-relative">
+      {/* Welcome Popup */}
+      {showWelcomePopup && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'between',
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#A45EE5',
+            color: 'white',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            zIndex: 1000,
+            animation: 'fadeIn 0.5s ease-in-out',
+            
+          }}
+        >
+          Welcome to the Dashboard!
+        </div>
+      )}
 
       <h2 className="mb-4 text-start">Dashboard</h2>
 
@@ -306,8 +327,8 @@ const Dashboard = () => {
       <div style={{ position: 'absolute', top: '10px', right: '10px', width: '250px' }}>
         <input
           type="text"
-          className="form-control form-control-sm rounded"
-          placeholder="Search"
+          className="form-control form-control-sm rounder"
+          placeholder="Search student name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ backgroundColor: 'var(--input-background-color)', color: 'var(--input-text-color)' }}
@@ -346,7 +367,7 @@ const Dashboard = () => {
       <div className="row mb-4">
         <img src={dashboard} alt="" className='dashboard-img' />
         {['Fullstack Development', 'UI/UX', 'Creator Course'].map((course) => (
-          <div className="col-md-4  dashboard-cards" key={course}>
+          <div className="col-md-4 mb-3 dashboard-cards" key={course}>
             <div className="card shadow" style={{ backgroundColor: 'var(--card-background-color)', color: 'var(--card-text-color)' }}>
               <div className="card-body">
                 <h5 className="text-center">{course}</h5>

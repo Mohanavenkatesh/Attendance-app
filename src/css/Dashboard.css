@@ -1,12 +1,43 @@
 .dashboard-img {
     width: 100%;
-
 }
 
-.dashboard-cards{
+.dashboard-cards {
+
     position: relative;
     bottom: 160px;
+    left: 150px;
     opacity: 0.6;
- 
+    margin: 10px;
+    width: 300px;
+    padding: 10px;
+    border-radius: 10px;
+
 }
 
+.dashboard-cards-1 {
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+}
+
+.card-body{
+    border-radius: 20px;
+}
+
+.dashboard-header {
+    position: relative;
+    top: 160px;
+    right: 320px;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.main-content-dashboard {
+    position: relative;
+    bottom: 100px;
+    width: 100%;
+    margin: 0 auto;
+}
