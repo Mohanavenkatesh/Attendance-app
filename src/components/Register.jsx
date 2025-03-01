@@ -7,6 +7,7 @@ import Logo from '../img/logo.png'; // ILogo
 import person1 from '../img/character-1.png'; // Person 1
 import person2 from '../img/character-2.png'; // Person 2
 import '../css/Register.css'; // Import the Login.css file
+import Vector from '../img/Vector.png';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -122,7 +123,7 @@ const Register = () => {
 
     } catch (error) {
       console.error(error);
-      
+     
       if (error.response && error.response.status === 400) {
         setModal({ show: true, message: 'Email or Mobile Number already registered!' });
       } else {
@@ -135,28 +136,43 @@ const Register = () => {
   };
 
   return (
+   
     <div className="register-container d-flex flex-column align-items-center justify-content-center vh-100 position-relative">
       {/* Navbar */}
       <nav className="navbar w-100 px-4 position-absolute top-0 start-0 d-flex justify-content-between">
        <img src={Logo} alt="" />
         <div>
-          <Link to='/Login'><button className="btn btn-light border me-2">Login</button></Link>
-          <Link to='/Register'><button className="btn button-color">Register</button></Link>
+          <Link to='/Login'><button className="btn btn-light me-2" style={{  padding: '10px 34px 14px 34px'}}>Login</button></Link>
+          <Link to='/Register'><button className="btn button-color" style={{  padding: '10px 34px 14px 34px'}}>Register</button></Link>
         </div>
       </nav>
 
-      <div className="register-card position-relative d-flex align-items-center justify-content-center" >
+              {/* Vector Image */}
+                     <div className="d-flex justify-content-start align-items-start m-lg-5" >
+                             <div className='vector'>
+                             <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
+                             </div>
+                           </div>
+
+                           {/* Vector Image */}
+                     <div className="d-flex justify-content-start align-items-start m-lg-5" >
+                             <div className='vector1'>
+                             <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
+                             </div>
+                           </div>
+             
+      <div className="register-card position-relative d-flex align-items-center justify-content-center mb-5" >
         <div className="hands-left position-absolute"></div>
         <div className="hands-right position-absolute"></div>
          <img src={person1} className='person1' alt="" />
         <div className=" shadow text-center w-100 maincard">
-          <h2 className="mb-5">Sign up to your account</h2>
+          <h2 className="sign mb-5">Sign up to your account</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-3 d-flex">
-              <div className="w-50 me-2">
+              <div className="name w-50 me-2 ">
                 <input
                   type="text"
-                  className={`form-control ${nameError ? 'is-invalid' : ''}`}
+                  className={`form-control ${nameError ? 'is-invalid' : ''}p-3`}
                   placeholder="Enter your name"
                   name="name"
                   value={formData.name}
@@ -164,10 +180,10 @@ const Register = () => {
                 />
                 {nameError && <div className="invalid-feedback">{nameError}</div>}
               </div>
-              <div className="w-50">
+              <div className="name h-75" >
                 <input
                   type="text"
-                  className={`form-control ${instituteNameError ? 'is-invalid' : ''}`}
+                  className={`form-control ${instituteNameError ? 'is-invalid' : ''}p-3`}
                   placeholder="Enter institute name"
                   name="instituteName"
                   value={formData.instituteName}
@@ -176,10 +192,10 @@ const Register = () => {
                 {instituteNameError && <div className="invalid-feedback">{instituteNameError}</div>}
               </div>
             </div>
-            <div className="mb-3">
+            <div className="name mb-3 " >
               <input
                 type="email"
-                className={`form-control ${emailError ? 'is-invalid' : ''}`}
+                className={`form-control ${emailError ? 'is-invalid' : ''}p-3`}
                 placeholder="Enter your email"
                 name="email"
                 value={formData.email}
@@ -187,10 +203,10 @@ const Register = () => {
               />
               {emailError && <div className="invalid-feedback">{emailError}</div>}
             </div>
-            <div className="mb-3">
+            <div className="name mb-3">
               <input
                 type="text"
-                className={`form-control ${mobileNumberError ? 'is-invalid' : ''}`}
+                className={`form-control ${mobileNumberError ? 'is-invalid' : ''}p-3`}
                 placeholder="Enter your mobile number"
                 name="mobileNumber"
                 value={formData.mobileNumber}
@@ -198,10 +214,10 @@ const Register = () => {
               />
               {mobileNumberError && <div className="invalid-feedback">{mobileNumberError}</div>}
             </div>
-            <div className="mb-3">
+            <div className="name mb-3">
               <input
                 type="password"
-                className={`form-control ${passwordError ? 'is-invalid' : ''}`}
+                className={`form-control ${passwordError ? 'is-invalid' : ''}p-3`}
                 placeholder="Enter password"
                 name="password"
                 value={formData.password}
@@ -209,10 +225,10 @@ const Register = () => {
               />
               {passwordError && <div className="invalid-feedback">{passwordError}</div>}
             </div>
-            <div className="mb-3">
+            <div className="name mb-3">
               <input
                 type="password"
-                className={`form-control ${confirmPasswordError ? 'is-invalid' : ''}`}
+                className={`form-control ${confirmPasswordError ? 'is-invalid' : ''}p-3`}
                 placeholder="Confirm password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
@@ -220,7 +236,7 @@ const Register = () => {
               />
               {confirmPasswordError && <div className="invalid-feedback">{confirmPasswordError}</div>}
             </div>
-            <button type="submit" className="btn button-color w-100" disabled={loading}>
+            <button type="submit" className="btn button-color w-50 p-3" disabled={loading}>
               {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : 'Register'}
             </button>
           </form>
@@ -228,10 +244,20 @@ const Register = () => {
          <img src={person2} className='person2' alt="" />
       </div>
 
+     
+
       {/* Modal component */}
       <Modal show={modal.show} message={modal.message} />
+      {/* Vector Image */}
+      {/* <div className="d-flex justify-content-end align-items-end m-lg-5" >
+          <div className='vector1'>
+            <img src={Vector} alt="Vector" className="Vector" style={{ width: '50px', height: '40px' }} />
+          </div>
+          </div> */}
     </div>
   );
 };
 
 export default Register;
+
+

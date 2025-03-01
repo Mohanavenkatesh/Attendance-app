@@ -109,7 +109,7 @@ const Login = ({ setIsAuthenticated }) => {
             setTimeout(() => {
                 setModal({ show: false, message: '' });
                 navigate('/dashboard');
-            }, 2000);
+            }, 0.1000);
         } catch (err) {
             console.error(err);
             setError('Invalid email or password');
@@ -135,12 +135,6 @@ const Login = ({ setIsAuthenticated }) => {
                 </div>
             </nav>
            
-            {/* Vector Image */}
-            {/* <div className='vector'>
-               <div className="d-flex justify-content-center m-lg-5" >
-                <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
-                </div>
-              </div> */}
 
             <div className='d-flex align-items-center justify-content-center flex-grow-1 '>
                 <div className='vector1'>
