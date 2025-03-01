@@ -3,23 +3,23 @@ import axios from 'axios';
 import moment from 'moment';
 import { Pie, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
-import  '../css/Dashboard.css';
-import dashboard from '../img/dashboard.png'
+import '../css/Dashboard.css';
+import dashboard from '../img/dashboard.png';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-  //  // ----- Static Upcoming Classes Data (Removed API fetching) -----
-  const upcomingClasses = [
-    { _id: "1", title: "Fullstack Development", date: "2025-02-28T09:30:00.000Z", batch: "9.30" },
-    { _id: "2", title: "UI/UX", date: "2025-02-28T10:30:00.000Z", batch: "10.30" },
-    { _id: "3", title: "Graphics Design", date: "2025-02-28T11:30:00.000Z", batch: "11.30" },
-    { _id: "4", title: "Creator Course", date: "2025-02-28T12:30:00.000Z", batch: "12.30" },
-    { _id: "5", title: "Digital Marketing", date: "2025-02-28T13:30:00.000Z", batch: "1.30" },
-    { _id: "6", title: "Web Design", date: "2025-02-28T14:30:00.000Z", batch: "2.30" },
-    { _id: "7", title: "Video Editing", date: "2025-02-28T15:30:00.000Z", batch: "3.30" },
-    { _id: "8", title: "Machine Learning", date: "2025-02-28T16:30:00.000Z", batch: "4.30" },
-    { _id: "9", title: "App Development", date: "2025-02-28T17:30:00.000Z", batch: "5.30" },
-  ];
+// Static Upcoming Classes Data
+const upcomingClasses = [
+  { _id: "1", title: "Fullstack Development", date: "2025-02-28T09:30:00.000Z", batch: "9.30" },
+  { _id: "2", title: "UI/UX", date: "2025-02-28T10:30:00.000Z", batch: "10.30" },
+  { _id: "3", title: "Graphics Design", date: "2025-02-28T11:30:00.000Z", batch: "11.30" },
+  { _id: "4", title: "Creator Course", date: "2025-02-28T12:30:00.000Z", batch: "12.30" },
+  { _id: "5", title: "Digital Marketing", date: "2025-02-28T13:30:00.000Z", batch: "1.30" },
+  { _id: "6", title: "Web Design", date: "2025-02-28T14:30:00.000Z", batch: "2.30" },
+  { _id: "7", title: "Video Editing", date: "2025-02-28T15:30:00.000Z", batch: "3.30" },
+  { _id: "8", title: "Machine Learning", date: "2025-02-28T16:30:00.000Z", batch: "4.30" },
+  { _id: "9", title: "App Development", date: "2025-02-28T17:30:00.000Z", batch: "5.30" },
+];
 
 const Dashboard = () => {
   const [admissions, setAdmissions] = useState([]);
@@ -30,31 +30,33 @@ const Dashboard = () => {
   const [attendanceError, setAttendanceError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [showWelcomePopup, setShowWelcomePopup] = useState(false); // State for welcome popup
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
   const scrollContainerRef = useRef(null);
   const leaderboardScrollRef = useRef(null);
 
+  // Fetch Admissions Data
   const fetchAdmissions = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/admissions');
       setAdmissions(response.data);
-      setLoading(false);
     } catch (err) {
       console.error('Error fetching admissions data:', err);
       setError('Error fetching admissions data');
+    } finally {
       setLoading(false);
     }
   };
 
+  // Fetch Attendance Data
   const fetchAttendance = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/attendance');
       setAttendance(response.data);
-      setAttendanceLoading(false);
     } catch (err) {
       console.error('Error fetching attendance:', err);
       setAttendanceError('Error fetching attendance data');
+    } finally {
       setAttendanceLoading(false);
     }
   };
@@ -62,215 +64,150 @@ const Dashboard = () => {
   useEffect(() => {
     fetchAdmissions();
     fetchAttendance();
-    setShowWelcomePopup(true); // Show the popup when the component mounts
-    const timer = setTimeout(() => {
-      setShowWelcomePopup(false); // Automatically close the popup after 2 seconds
-    }, 2000);
-    return () => clearTimeout(timer); // Cleanup the timer on unmount
+    setShowWelcomePopup(true);
+    const timer = setTimeout(() => setShowWelcomePopup(false), 2000);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Sort upcoming classes by date.
-  const sortedClasses = [...upcomingClasses].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
-  // --- Batch-Based Sorting ---
+  // Sort Upcoming Classes by Date and Batch
+  const sortedClasses = [...upcomingClasses].sort((a, b) => new Date(a.date) - new Date(b.date));
   const batchOrder = ["9.30", "10.30", "11.30", "12.30", "1.30", "2.30", "3.30", "4.30", "5.30"];
-  const batchTimesMapping = {
-    "9.30": { hour: 9, minute: 30 },
-    "10.30": { hour: 10, minute: 30 },
-    "11.30": { hour: 11, minute: 30 },
-    "12.30": { hour: 12, minute: 30 },
-    "1.30": { hour: 13, minute: 30 },
-    "2.30": { hour: 14, minute: 30 },
-    "3.30": { hour: 15, minute: 30 },
-    "4.30": { hour: 16, minute: 30 },
-    "5.30": { hour: 17, minute: 30 },
-  };
+  const batchTimesMapping = batchOrder.reduce((acc, batch) => {
+    const [hour, minute] = batch.split('.').map(Number);
+    acc[batch] = { hour, minute };
+    return acc;
+  }, {});
 
   const now = moment();
-  const todayBatchMoments = batchOrder.map(batch => moment().set(batchTimesMapping[batch]));
-  let nextBatchIndex = batchOrder.findIndex((batch, index) => now.isBefore(todayBatchMoments[index]));
-  if (nextBatchIndex === -1) nextBatchIndex = 0;
-  const rotatedBatchOrder = batchOrder.slice(nextBatchIndex).concat(batchOrder.slice(0, nextBatchIndex));
+  const nextBatchIndex = batchOrder.findIndex((batch) => now.isBefore(moment().set(batchTimesMapping[batch])));
+  const rotatedBatchOrder = [...batchOrder.slice(nextBatchIndex), ...batchOrder.slice(0, nextBatchIndex)];
+  const sortedClassesByBatch = [...sortedClasses].sort((a, b) => rotatedBatchOrder.indexOf(a.batch) - rotatedBatchOrder.indexOf(b.batch));
 
-  const sortedClassesByBatch = [...sortedClasses].sort((a, b) => {
-    const indexA = rotatedBatchOrder.indexOf(a.batch);
-    const indexB = rotatedBatchOrder.indexOf(b.batch);
-    return indexA - indexB;
-  });
-
-  // Vertical Auto-scroll effect for upcoming classes.
+  // Auto-scroll Effect for Upcoming Classes
   useEffect(() => {
     const interval = setInterval(() => {
       if (scrollContainerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
         scrollContainerRef.current.scrollTop += 1;
-        if (
-          scrollContainerRef.current.scrollTop >=
-          scrollContainerRef.current.scrollHeight - scrollContainerRef.current.clientHeight
-        ) {
-          scrollContainerRef.current.scrollTop = 0;
-        }
+        if (scrollTop >= scrollHeight - clientHeight) scrollContainerRef.current.scrollTop = 0;
       }
     }, 50);
     return () => clearInterval(interval);
-  }, [sortedClassesByBatch]);
+  }, []);
 
-  // Group Admissions by course.
-  const groupByCourse = (admissions) =>
-    admissions.reduce((groups, admission) => {
-      const course = admission.course;
-      if (!groups[course]) {
-        groups[course] = [];
-      }
-      groups[course].push(admission);
-      return groups;
-    }, {});
-  const groupedAdmissions = groupByCourse(admissions);
+  // Group Admissions by Course
+  const groupedAdmissions = admissions.reduce((acc, admission) => {
+    const course = admission.course;
+    if (!acc[course]) acc[course] = [];
+    acc[course].push(admission);
+    return acc;
+  }, {});
 
-  // Filter Today's Attendance.
+  // Filter Today's Attendance
   const todayStr = moment().format('YYYY-MM-DD');
-  const todayAttendance = attendance.filter(
-    (att) => moment(att.date).format('YYYY-MM-DD') === todayStr
-  );
+  const todayAttendance = attendance.filter((att) => moment(att.date).format('YYYY-MM-DD') === todayStr);
   const groupedAttendance = todayAttendance.reduce((acc, record) => {
-    if (record.studentId && record.studentId._id) {
+    if (record.studentId?._id) {
       const id = record.studentId._id;
-      if (!acc[id]) {
-        acc[id] = record.status;
-      } else if (acc[id] === 'Absent' && record.status === 'Present') {
-        acc[id] = 'Present';
-      }
+      if (!acc[id] || (acc[id] === 'Absent' && record.status === 'Present')) acc[id] = record.status;
     }
     return acc;
   }, {});
-  const presentCount = Object.values(groupedAttendance).filter(
-    (status) => status === 'Present'
-  ).length;
-  const absentCount = Object.values(groupedAttendance).filter(
-    (status) => status === 'Absent'
-  ).length;
+  const presentCount = Object.values(groupedAttendance).filter((status) => status === 'Present').length;
+  const absentCount = Object.values(groupedAttendance).filter((status) => status === 'Absent').length;
+
+  // Pie Chart Data
   const pieData = {
-    labels: ['Present', 'Absent'],
-    datasets: [
-      {
-        data: [presentCount, absentCount],
-        backgroundColor: ['#28a745', '#dc3545'],
-        hoverBackgroundColor: ['#218838', '#c82333'],
-        borderWidth: 1,
-      },
-    ],
+    datasets: [{
+      rotation: 120,
+      data: [presentCount || 0, absentCount || 0],
+      backgroundColor: ["#9B5DE5", "#D3D3D3"],
+      hoverBackgroundColor: ["#8A4BC3", "#BEBEBE"],
+      borderWidth: 0,
+      cutout: "80%",
+      borderRadius: 15,
+    }],
+    labels: ["Present", "Absent"],
   };
 
   // Weekly Attendance Summary
   const startOfWeek = moment().startOf('isoWeek');
   const endOfWeek = moment().endOf('isoWeek');
-  const weekAttendance = attendance.filter((att) => {
-    const attDate = moment(att.date);
-    return attDate.isBetween(startOfWeek, endOfWeek, null, '[]');
-  });
-
-  const daysOfWeek = [];
-  const currentWeekDate = startOfWeek.clone();
-  while (currentWeekDate.isSameOrBefore(endOfWeek)) {
-    daysOfWeek.push(currentWeekDate.clone());
-    currentWeekDate.add(1, 'day');
-  }
-
+  const weekAttendance = attendance.filter((att) => moment(att.date).isBetween(startOfWeek, endOfWeek, null, '[]'));
+  const daysOfWeek = Array.from({ length: 7 }, (_, i) => startOfWeek.clone().add(i, 'day'));
   const weeklyData = daysOfWeek.map((day) => {
     const dayStr = day.format('YYYY-MM-DD');
-    const recordsForDay = weekAttendance.filter(
-      (att) => moment(att.date).format('YYYY-MM-DD') === dayStr
-    );
-    const group = {};
-    recordsForDay.forEach((record) => {
-      if (record.studentId && record.studentId._id) {
+    const recordsForDay = weekAttendance.filter((att) => moment(att.date).format('YYYY-MM-DD') === dayStr);
+    const group = recordsForDay.reduce((acc, record) => {
+      if (record.studentId?._id) {
         const id = record.studentId._id;
-        if (!group[id]) {
-          group[id] = record.status;
-        } else if (group[id] === 'Absent' && record.status === 'Present') {
-          group[id] = 'Present';
-        }
+        if (!acc[id] || (acc[id] === 'Absent' && record.status === 'Present')) acc[id] = record.status;
       }
-    });
-    const dayPresentCount = Object.values(group).filter(
-      (status) => status === 'Present'
-    ).length;
-    const dayAbsentCount = Object.values(group).filter(
-      (status) => status === 'Absent'
-    ).length;
+      return acc;
+    }, {});
     return {
-      day: day.format('ddd'), // Display day of the week (e.g., Mon, Tue, etc.)
-      present: dayPresentCount,
-      absent: dayAbsentCount,
+      day: day.format('ddd'),
+      present: Object.values(group).filter((status) => status === 'Present').length,
+      absent: Object.values(group).filter((status) => status === 'Absent').length,
     };
   });
 
+  // Bar Chart Data
   const barData = {
     labels: weeklyData.map((d) => d.day),
     datasets: [
       {
         label: 'Present',
         data: weeklyData.map((d) => d.present),
-        backgroundColor: '#28a745',
+        backgroundColor: "#9B5DE5",
+        hoverBackgroundColor: "#8A4BC3",
+        borderRadius: 100,
       },
       {
         label: 'Absent',
         data: weeklyData.map((d) => d.absent),
-        backgroundColor: '#dc3545',
+        backgroundColor: "#D3D3D3",
+        hoverBackgroundColor: "#BEBEBE",
+        borderRadius: 15,
       },
     ],
   };
 
-  // Leaderboard: Compute monthly attendance ranking for students based on 'Present' records.
-  const startOfMonth = moment().startOf('month'); // Start of the current month
-  const endOfMonth = moment().endOf('month'); // End of the current month
-
-  const leaderboard = {};
-  attendance.forEach(record => {
-    const recordDate = moment(record.date);
-    if (
-      record.studentId &&
-      record.studentId._id &&
-      record.status === 'Present' &&
-      recordDate.isBetween(startOfMonth, endOfMonth, null, '[]') // Check if the record is within the current month
-    ) {
+  // Leaderboard Data
+  const startOfMonth = moment().startOf('month');
+  const endOfMonth = moment().endOf('month');
+  const leaderboard = attendance.reduce((acc, record) => {
+    if (record.studentId?._id && record.status === 'Present' && moment(record.date).isBetween(startOfMonth, endOfMonth, null, '[]')) {
       const id = record.studentId._id;
-      if (!leaderboard[id]) {
-        leaderboard[id] = { name: record.studentId.name || 'Unknown', count: 0 };
-      }
-      leaderboard[id].count += 1;
+      if (!acc[id]) acc[id] = { name: record.studentId.name || 'Unknown', count: 0 };
+      acc[id].count += 1;
     }
-  });
-
+    return acc;
+  }, {});
   const leaderboardArray = Object.values(leaderboard).sort((a, b) => b.count - a.count);
 
-  // Vertical Auto-scroll effect for attendance leaderboard.
+  // Auto-scroll Effect for Leaderboard
   useEffect(() => {
     const interval = setInterval(() => {
       if (leaderboardScrollRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = leaderboardScrollRef.current;
         leaderboardScrollRef.current.scrollTop += 1;
-        if (
-          leaderboardScrollRef.current.scrollTop >=
-          leaderboardScrollRef.current.scrollHeight - leaderboardScrollRef.current.clientHeight
-        ) {
-          leaderboardScrollRef.current.scrollTop = 0;
-        }
+        if (scrollTop >= scrollHeight - clientHeight) leaderboardScrollRef.current.scrollTop = 0;
       }
     }, 50);
     return () => clearInterval(interval);
-  }, [leaderboardArray]);
+  }, []);
 
-  // Filter admissions based on search term (by student name).
-  const filteredAdmissions = admissions.filter(admission =>
+  // Filter Admissions by Search Term
+  const filteredAdmissions = admissions.filter((admission) =>
     admission.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Early returns for loading/error.
+  // Loading and Error States
   if (loading) return <div className="alert alert-info">Loading Admissions...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
 
-  // If a student is selected, show detailed report (filter out __v, id, _id).
+  // Detailed Student Report
   if (selectedStudent) {
     return (
       <div className="container mt-5">
@@ -278,12 +215,12 @@ const Dashboard = () => {
           Back to Dashboard
         </button>
         <h2 className="mb-4 text-center">Student Detailed Report</h2>
-        <div className=" shadow-sm">
-          <div className="">
+        <div className="shadow-sm">
+          <div>
             <h4>{selectedStudent.name}</h4>
             <ul className="list-unstyled">
               {Object.keys(selectedStudent)
-                .filter(key => key !== '__v' && key !== 'id' && key !== '_id')
+                .filter((key) => !['__v', 'id', '_id'].includes(key))
                 .map((key) => (
                   <li key={key}>
                     <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {selectedStudent[key]}
@@ -297,37 +234,14 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="container  position-relative">
-      {/* Welcome Popup */}
-      {showWelcomePopup && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'between',
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            backgroundColor: '#A45EE5',
-            color: 'white',
-            padding: '10px 20px',
-            borderRadius: '5px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            zIndex: 1000,
-            animation: 'fadeIn 0.5s ease-in-out',
-            
-          }}
-        >
-          Welcome to the Dashboard!
-        </div>
-      )}
-
+    <div className="container">
       <h2 className="mb-4 text-start">Dashboard</h2>
 
-      {/* Search Bar in Top-Right Corner */}
+      {/* Search Bar */}
       <div style={{ position: 'absolute', top: '10px', right: '10px', width: '250px' }}>
         <input
           type="text"
-          className="form-control form-control-sm rounder"
+          className="form-control form-control-sm rounded-lg px-2   shadow-sm"
           placeholder="Search student name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -335,7 +249,7 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* If search term is provided, show search results */}
+      {/* Search Results */}
       {searchTerm && (
         <div className="mb-5">
           <h4>Search Results</h4>
@@ -363,46 +277,46 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Admissions Data by Course (Count Only) */}
-      <div className="row mb-4">
-        <img src={dashboard} alt="" className='dashboard-img' />
-        {['Fullstack Development', 'UI/UX', 'Creator Course'].map((course) => (
-          <div className="col-md-4 mb-3 dashboard-cards" key={course}>
-            <div className="card shadow" style={{ backgroundColor: 'var(--card-background-color)', color: 'var(--card-text-color)' }}>
-              <div className="card-body">
-                <h5 className="text-center">{course}</h5>
-                <p className="text-center">{groupedAdmissions[course] ? groupedAdmissions[course].length : 0} Students</p>
+      {/* Admissions Data by Course */}
+      <div className="dashboard-cards">
+        <div className="dashboard-cards-header">
+          <h1 className="text-start">Our Courses</h1>
+          <h5 className="text-start mb-4">Number of Students in Each Course</h5>
+        </div>
+        {['Fullstack Development', 'UI/UX', 'Creator Course', 'Graphics Design'].map((course) => (
+          <div className="dashboard-card" key={course}>
+            <div className="dashboard-card-content">
+              <div>
+                <h5>{course}</h5>
+                <p>{groupedAdmissions[course]?.length || 0} Students</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* 3-Column Layout for Today's Attendance, Weekly Summary, and Upcoming Classes */}
-      <div className="row mb-4">
-        <div className="col-md-4">
-          <h5 className="text-center">Today's Attendance</h5>
-          <div className="p-2" style={{ height: '300px' }}>
+      {/* 3-Column Layout */}
+      <div className="row d-flex justify-content-between">
+        <div className="col-md-3 my-3 mx-2 p-3 rounded-lg d-flex flex-column justify-content-center align-items-center">
+          <h5 className='mb-2'>Day wise summary</h5>
+          <div style={{ height: '245px' }}>
             <Pie data={pieData} options={{ maintainAspectRatio: true, responsive: true }} />
           </div>
         </div>
 
-        <div className="col-md-4">
-          <h5 className="text-center">Weekly Attendance Summary</h5>
-          <div className="p-2">
+        <div className="col-md-3 my-3 mx-0 p-3 rounded-lg d-flex flex-column justify-content-center align-items-center ">
+          <h5>Weekly summary</h5>
+          <div className='d-flex justify-content-center align-items-center' style={{ height: '245px' }}>
             <Bar data={barData} options={{ maintainAspectRatio: true, responsive: true }} />
-          </div>
-          <div className="text-center mt-2">
-            <p>Week: {moment().startOf('isoWeek').format('MMM D')} - {moment().endOf('isoWeek').format('MMM D')}</p>
           </div>
         </div>
 
-        <div className="col-md-4">
-          <h5 className="text-center">Upcoming Classes</h5>
+        <div className="col-md-3 my-3 mx-0 p-3 rounded-lg d-flex flex-column justify-content-center align-items-center ">
+          <h5 className="text-center mb-4">Upcoming class</h5>
           <div
-            className="card shadow-sm"
+            className=""
             ref={scrollContainerRef}
-            style={{ height: '300px', overflow: 'hidden' }} // Updated style to remove scrollbar
+            style={{ height: '230px', width: '300px', overflow: 'hidden' }}
           >
             <ul className="list-group list-group-flush">
               {[...sortedClassesByBatch, ...sortedClassesByBatch].map((cls, index) => (
@@ -424,11 +338,11 @@ const Dashboard = () => {
       {/* Attendance Leaderboard */}
       <div className="row mb-4 justify-content-center">
         <div className="col-md-12">
-          <h5 className="text-center">Attendance Leaderboard</h5>
+          <h5 className="text-center p-1 bg-color rounded">Attendance Leaderboard</h5>
           <div
-            className="card shadow-sm"
+            className=""
             ref={leaderboardScrollRef}
-            style={{ height: '300px', overflow: 'hidden' }} // Updated style to remove scrollbar
+            style={{ height: '300px', overflow: 'hidden' }}
           >
             <ul className="list-group list-group-flush">
               {[...leaderboardArray, ...leaderboardArray].map((student, index) => (

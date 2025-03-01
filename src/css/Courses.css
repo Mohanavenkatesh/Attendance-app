@@ -1,0 +1,28 @@
+.date {
+
+    width: 300px;
+    text-align: center;
+}
+
+.date-text {
+    margin-top: -45px;
+    margin-right: -50px;
+}
+
+.text {
+    width: 300px;
+    margin-top: -50px;
+}
+
+.course {
+    font-family: Merriweather;
+    font-size: 25px;
+    font-weight: 700;
+    color: #353537;
+    margin-left: 10px;
+}
+
+.book {
+    width: 20px;
+    height: 30px;
+}

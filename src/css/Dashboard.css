@@ -1,43 +1,83 @@
-.dashboard-img {
-    width: 100%;
-}
-
 .dashboard-cards {
-
-    position: relative;
-    bottom: 160px;
-    left: 150px;
-    opacity: 0.6;
-    margin: 10px;
-    width: 300px;
-    padding: 10px;
-    border-radius: 10px;
-
-}
-
-.dashboard-cards-1 {
-
-    padding: 20px;
-
-    border-radius: 10px;
-
-}
-
-.card-body{
-    border-radius: 20px;
-}
-
-.dashboard-header {
-    position: relative;
-    top: 160px;
-    right: 320px;
-    width: fit-content;
-    margin: 0 auto;
-}
-
-.main-content-dashboard {
-    position: relative;
-    bottom: 100px;
+    background-image: url('../img/dashboard.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 300px;
     width: 100%;
-    margin: 0 auto;
-}
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Align items to the bottom */
+    margin-bottom: 1rem;
+    padding: 10px; /* Add padding to create space around the cards */
+    position: relative; /* Make the container position relative */
+  }
+  
+  .dashboard-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 20%; /* Make the cards smaller */
+    margin: 0 5px;
+    background-color: var(--card-background-color);
+    color: var(--card-text-color);
+    border-radius: 15px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0.75;
+  }
+  
+  .dashboard-cards-1 {
+    border-radius: 15px;
+    top: 30px;
+    width: 100%;
+  }
+  
+  .dashboard-card-content {
+    padding: 10px;
+  }
+  
+  .dashboard-card h5 {
+    margin-bottom: 5px;
+  }
+  
+  .dashboard-card p {
+    margin: 0;
+  }
+  
+  .dashboard-cards-header {
+    position: absolute;
+    top: 50px;
+    left: 52%;
+    transform: translateX(-50%);
+    text-align: start;
+    width: 100%;
+    color: rgb(0, 0, 0); /* Ensure the text is visible on the background image */
+  }
+  
+  /* Media Queries for Responsiveness */
+  @media (max-width: 1200px) {
+    .dashboard-card {
+      flex: 1 1 22%;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .dashboard-card {
+      flex: 1 1 30%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-card {
+      flex: 1 1 45%;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .dashboard-card {
+      flex: 1 1 100%;
+      margin-bottom: 10px;
+    }
+  }

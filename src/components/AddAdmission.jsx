@@ -139,7 +139,7 @@ const AddAdmission = () => {
       // Close the form after 2 seconds
       setTimeout(() => {
         setShowForm(false);
-      }, 2000);
+      }, 0.100);
 
     } catch (error) {
       console.error(error);

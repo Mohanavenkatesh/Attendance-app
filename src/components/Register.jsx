@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Modal from './Model'; // Import the Modal component
+import Modal from './Model'; // Corrected import
 import Logo from '../img/logo.png'; // ILogo
 import person1 from '../img/character-1.png'; // Person 1
 import person2 from '../img/character-2.png'; // Person 2
