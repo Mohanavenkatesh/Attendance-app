@@ -4,8 +4,9 @@ import moment from 'moment';
 import { Pie, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import '../css/Dashboard.css';
-import dashboard from '../img/dashboard.png'
-import profile from '../img/profile.png'
+
+
+
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -344,7 +345,6 @@ const Dashboard = () => {
 
       {/* Admissions Data by Course (Count Only) */}
       <div className="row mb-4">
-        <img src={dashboard} alt="" className='dashboard-img' />
         {['Fullstack Development', 'UI/UX', 'Creator Course'].map((course) => (
           <div className="col-md-4  dashboard-cards" key={course}>
             <div className="card shadow" style={{ backgroundColor: 'var(--card-background-color)', color: 'var(--card-text-color)' }}>
