@@ -5,13 +5,14 @@
 :root {
   --background-color: #ffffff;
   --text-color: #000000;
-  --sidebar-background-color: #f8f9fa;
+  --sidebar-background-color: #ffffff;
   --sidebar-text-color: #000000;
   --card-background-color: #ffffff;
   --card-text-color: #000000;
   --input-background-color: #ffffff;
   --input-text-color: #000000;
-  --input-placeholder-color: #666666; /* Placeholder color for light theme */
+  --input-placeholder-color: #666666;
+  /* Placeholder color for light theme */
   --button-background-color: #a45ee5;
   --button-text-color: #ffffff;
 }
@@ -25,7 +26,8 @@
   --card-text-color: #ffffff;
   --input-background-color: #000000;
   --input-text-color: #ffffff;
-  --input-placeholder-color: #aaaaaa; /* Placeholder color for dark theme */
+  --input-placeholder-color: #aaaaaa;
+  /* Placeholder color for dark theme */
   --button-background-color: #a45ee5;
   --button-text-color: #ffffff;
 }
@@ -34,6 +36,15 @@
 
 .text-color {
   color: #a45ee5;
+}
+
+.bg-color{
+  background-color: #a45ee5;
+  color: #ffffff;
+}
+
+.border-color{
+  border-color: #a45ee5;
 }
 
 .button-color {
@@ -48,13 +59,15 @@
 
 .selected-component {
   color: #ffffff;
-  background-color: #CF9CFF;
+  background-color: #a45ee5;
   text-decoration: none;
 }
 
 .selected-component:hover {
-  color: #ffffff; /* Ensure text color remains white on hover */
-  background-color: #CF9CFF; /* Ensure background color remains the same on hover */
+  color: #ffffff;
+  /* Ensure text color remains white on hover */
+  background-color: #CF9CFF;
+  /* Ensure background color remains the same on hover */
 }
 
 /* ------------Present Sir Theme End --------------- */
@@ -73,20 +86,26 @@ body {
 
 }
 
+
 .nav-link {
   color: var(--sidebar-text-color);
   text-decoration: none;
 }
 
 .nav-link:hover {
-  color: var(--sidebar-text-color); /* Disable hover effect */
-  background-color: var(--sidebar-background-color); /* Disable hover effect */
+  color: var(--sidebar-text-color);
+  /* Disable hover effect */
+  background-color: var(--sidebar-background-color);
+  /* Disable hover effect */
 }
+
 
 .nav-link.selected-component {
   color: #ffffff;
-  background-color: #CF9CFF;
+  background-color: #a45ee5;
 }
+
+
 
 button {
   background-color: var(--button-background-color);
@@ -94,7 +113,11 @@ button {
 }
 
 /* Additional styles for other components */
-.navbar, .list-group-item, .badge, .form-control, .form-select {
+.navbar,
+.list-group-item,
+.badge,
+.form-control,
+.form-select {
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -103,6 +126,7 @@ button {
   background-color: var(--card-background-color);
   color: var(--card-text-color);
 }
+
 /* Dashboard upcoming class scroll bar hide css */
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -112,8 +136,10 @@ button {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Report calendar color */
@@ -176,11 +202,13 @@ button {
 }
 
 [data-theme='dark'] ::placeholder {
-  color: #aaaaaa; /* Light gray color for dark theme */
+  color: #aaaaaa;
+  /* Light gray color for dark theme */
 }
 
 [data-theme='light'] ::placeholder {
-  color: #666666; /* Dark gray color for light theme */
+  color: #666666;
+  /* Dark gray color for light theme */
 }
 
 /* Report.css */
@@ -349,8 +377,10 @@ button {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Report calendar color */
@@ -416,6 +446,7 @@ button {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -434,6 +465,7 @@ button {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -481,6 +513,7 @@ button {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -510,6 +543,7 @@ button {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -539,6 +573,7 @@ button {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

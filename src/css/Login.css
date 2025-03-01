@@ -1,21 +1,9 @@
-.maincard {
-  padding: 0px;
-  border-radius: 30px;
-  z-index: 1;
-}
-
-.person1 {
+.vector2{
   position: relative;
-  top: -100px;
-  left: 50px;
+  bottom: 200px;
+  left: 70px;
   z-index: 2;
-}
-
-.person2 {
-  position: relative;
-  top: 90px;
-  left: -50px;
-  z-index: 2;
-
-}
-
+ }
+ .forget{
+  text-decoration: none;
+ }

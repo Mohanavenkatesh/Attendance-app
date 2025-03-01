@@ -1,8 +1,9 @@
+
 .maincard{
   padding: 100px;
   border-radius: 30px;
   z-index: 1;
-  width: ;
+  /* width: ; */
 }
 
 .person1{
@@ -19,3 +20,31 @@
     z-index: 2;
 
 }
+.vector{
+    position: relative;
+    top: 400px;
+  left: 400px;
+    z-index: 2;
+}
+.vector1{
+  position: relative;
+  top: 200px;
+  left: -450px;
+  z-index: 2;
+   
+}
+.name{
+  font-family: "DM Sans",sans-serif;
+  font-weight: 400;
+  size: 14px;
+  line-height: 26px;
+  align-items: center;
+}
+.sign{
+  font-family: "Merriweather",serif;
+  font-weight: 700;
+  font-size: 35px;
+  color: #353537;
+  line-height: 30px;
+}
+
