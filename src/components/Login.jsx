@@ -1,11 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Modal from './Model'; // Corrected import
+import Modal from './Model'; // Import the Modal component
 import Logo from '../img/logo.png'; // ILogo
 import person1 from '../img/character-1.png'; // Person 1
 import person2 from '../img/character-2.png'; // Person 2
 import '../css/Login.css'; // Import the Login.css file
+import Vector from '../img/Vector.png';
+
 
 const Login = ({ setIsAuthenticated }) => {
     const [formData, setFormData] = useState({
@@ -90,11 +93,6 @@ const Login = ({ setIsAuthenticated }) => {
                 password,
             });
 
-            // Clear previous user data from local storage
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userInfo');
-
-            // Store new user data in local storage
             localStorage.setItem('authToken', response.data.token);
             localStorage.setItem('userInfo', JSON.stringify(response.data.user));
             setIsAuthenticated(true);
@@ -111,7 +109,7 @@ const Login = ({ setIsAuthenticated }) => {
             setTimeout(() => {
                 setModal({ show: false, message: '' });
                 navigate('/dashboard');
-            }, 100); // Corrected setTimeout duration
+            }, 2000);
         } catch (err) {
             console.error(err);
             setError('Invalid email or password');
@@ -121,31 +119,52 @@ const Login = ({ setIsAuthenticated }) => {
     };
 
     return (
-        <div className="login-container d-flex flex-column align-items-center vh-100">
+
+       
+
+        <div className="login-container d-flex flex-column  vh-100">
             <nav className="navbar navbar-light w-100 px-4">
-                <img src={Logo} alt="" />
+               <img src={Logo} alt="" />
                 <div>
-                    <Link to='/Login'><button className="btn btn-light border me-2">Login</button></Link>
-                    <Link to='/Register'><button className="btn button-color">Register</button></Link>
+                    <Link to='/Login'><button className="btn btn-light  me-3"style={{
+                        padding: '10px 34px 14px 34px'
+                    }}>Login</button></Link>
+                    <Link to='/Register'><button className="btn button-color" style={{
+                        padding: '10px 34px 14px 34px'
+                    }}>Register</button></Link>
                 </div>
             </nav>
+           
+            {/* Vector Image */}
+            {/* <div className='vector'>
+               <div className="d-flex justify-content-center m-lg-5" >
+                <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
+                </div>
+              </div> */}
 
             <div className='d-flex align-items-center justify-content-center flex-grow-1 '>
-                <img src={person1} className='person1' alt="" />
+                <div className='vector1'>
+                <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
+                </div>
+                <div className='vector2'>
+                <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
+                </div>
+                            <img src={person1} className='person1' alt="" />
+                         
                 <div className="login-card position-relative">
                     <div className="hands-left"></div>
                     <div className="hands-right"></div>
                     <div>
                         <div className="maincard shadow text-center" >
-                            <h2 className="mb-5">Sign in to your account</h2>
+                            <h2 className="sign mb-5">Sign in to your account</h2>
 
                             {error && <div className="alert alert-danger">{error}</div>}
 
                             <form onSubmit={handleSubmit} noValidate>
-                                <div className="mb-3">
+                                <div className="name mb-3">
                                     <input
                                         type="email"
-                                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                                        className={`form-control ${errors.email ? 'is-invalid' : ''}p-3`}
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
@@ -160,10 +179,10 @@ const Login = ({ setIsAuthenticated }) => {
                                     )}
                                 </div>
 
-                                <div className="mb-3">
+                                <div className=" name mb-3">
                                     <input
                                         type="password"
-                                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                                        className={`form-control ${errors.password ? 'is-invalid' : ''}p-3`}
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
@@ -178,8 +197,8 @@ const Login = ({ setIsAuthenticated }) => {
                                     )}
                                 </div>
 
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
+                                <div className="d-flex justify-content-between align-items-center mb-3 ">
+                                    <div className='remember mt-4 d-flex gap-1' style={{}}>
                                         <input
                                             type="checkbox"
                                             id="remember-me"
@@ -189,10 +208,10 @@ const Login = ({ setIsAuthenticated }) => {
                                         />
                                         <label htmlFor="remember-me">Remember me</label>
                                     </div>
-                                    <a href="#" className="text-primary">Forgot password?</a>
+                                    <a href="#" className="forget text-primary mt-4">Forgot password?</a>
                                 </div>
 
-                                <button type="submit" className="btn button-color w-100" disabled={loading}>
+                                <button type="submit" className="sign-in btn button-color w-50 p-3 mt-4" disabled={loading}>
                                     {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : 'Sign In'}
                                 </button>
                             </form>
@@ -202,9 +221,18 @@ const Login = ({ setIsAuthenticated }) => {
                 <img src={person2} className='person2' alt="" />
             </div>
 
+
+       
             <Modal show={modal.show} message={modal.message} />
         </div>
+
+       
     );
 };
 
 export default Login;
+
+
+
+
+

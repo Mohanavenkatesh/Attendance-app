@@ -237,12 +237,12 @@ const Report = () => {
 
       <Accordion>
         {filteredStudents.map((student, index) => (
-          <Card key={student._id}>
-            <Card.Header>
-              <CustomToggle eventKey={index.toString()} onClick={() => setSelectedStudent(student._id)}>
+          <div key={student._id}>
+           
+              <CustomToggle className eventKey={index.toString()} onClick={() => setSelectedStudent(student._id)}>
                 {student.name}
               </CustomToggle>
-            </Card.Header>
+           
             <Accordion.Collapse eventKey={index.toString()}>
               <Card.Body>
                 <div className="row">
@@ -270,7 +270,7 @@ const Report = () => {
                 </div>
               </Card.Body>
             </Accordion.Collapse>
-          </Card>
+          </div>
         ))}
       </Accordion>
     </div>

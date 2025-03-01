@@ -85,17 +85,17 @@ const Sidebar = ({ setIsAuthenticated }) => {
       >
         {/* Profile Image */}
         {isOpen && user && (
-        <img
-          src={profile}
-          alt="Profile"
-          style={{
-            width: isOpen ? 'auto' : '30px',
-            opacity: isOpen ? 1 : 0.6,
-            transition: 'all 0.3s ease',
-            marginBottom: '20px'
-          }}
-        />
-      )}
+          <img
+            src={profile}
+            alt="Profile"
+            style={{
+              width: isOpen ? 'auto' : '30px',
+              opacity: isOpen ? 1 : 0.6,
+              transition: 'all 0.3s ease',
+              marginBottom: '20px'
+            }}
+          />
+        )}
 
         {/* Navigation Links */}
         <ul className="nav nav-pills flex-column mb-auto">
