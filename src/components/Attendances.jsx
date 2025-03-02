@@ -121,7 +121,7 @@ const Attendances = () => {
     <Container fluid>
       <div className="shadow-sm mb-4">
 
-        <div className='d-flex justify-content-between py-4'>
+        <div className='d-flex justify-content-between py-2'>
 
           <div className='d-flex '>
 
@@ -186,7 +186,7 @@ const Attendances = () => {
 
         <ListGroup>
           {filteredStudents.map((student) => (
-            <ListGroup.Item key={student._id} className="d-flex justify-content-between align-items-center student-list-item">
+            <ListGroup.Item key={student._id} className="d-flex p-2 justify-content-between r align-items-center student-list-item">
               <div>
                 <img src={profile} className='me-2' />
                 <strong>{student.name}</strong>

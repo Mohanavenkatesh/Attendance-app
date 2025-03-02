@@ -169,10 +169,10 @@ const Report = () => {
 
     return (
       <div className="accordion-header" onClick={decoratedOnClick}>
-        <Button variant="link" className="w-100 d-flex justify-content-between align-items-center p-3">
+        <Button variant="btn" className="w-100 d-flex justify-content-between mb-5 align-items-center p-3 border">
           <div className="d-flex align-items-center">
-            <FaUserGraduate className="me-3 text-primary" />
-            <h5 className="mb-0">{children}</h5>
+            <FaUserGraduate className="me-3 text-color text-decoration-none" />
+            <h5 className="mb-0 text-color text-decoration-none">{children}</h5>
           </div>
           {isOpen ? <FaChevronUp /> : <FaChevronDown />}
         </Button>

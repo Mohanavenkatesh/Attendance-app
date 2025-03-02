@@ -108,7 +108,7 @@ const Login = ({ setIsAuthenticated }) => {
             setTimeout(() => {
                 setModal({ show: false, message: '' });
                 navigate('/dashboard');
-            }, 2000);
+            }, 0.100);
         } catch (err) {
             console.error(err);
             setModal({ show: true, message: 'Invalid email or password' });
