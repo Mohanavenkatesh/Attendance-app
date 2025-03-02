@@ -8,16 +8,18 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 import { Accordion, Card, Button, useAccordionButton, Form } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { FaChevronDown, FaChevronUp, FaUserGraduate } from 'react-icons/fa';
+import '../css/Report.css';
 
 const Report = () => {
+  // State declarations
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState('All');
   const [selectedBatch, setSelectedBatch] = useState('All');
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Use Date object for react-datepicker
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -125,25 +127,6 @@ const Report = () => {
     return { presentCount, absentCount, presentPercentage, absentPercentage };
   };
 
-  // Mark Attendance
-  const markAttendance = async (studentId, status) => {
-    try {
-      const attendanceData = { studentId, date: selectedDate, status };
-      await axios.post('http://localhost:5000/api/attendance', attendanceData);
-      setMessage(`Attendance marked as ${status} on ${moment(selectedDate).format('YYYY-MM-DD')}`);
-      setAttendanceStatus(prev => ({
-        ...prev,
-        [studentId]: {
-          ...prev[studentId],
-          [moment(selectedDate).format('YYYY-MM-DD')]: status,
-        },
-      }));
-    } catch (error) {
-      console.error('Error marking attendance:', error);
-      setMessage('Error marking attendance');
-    }
-  };
-
   // Get Tile Class Name for Calendar
   const getTileClassName = ({ date, view }, studentId) => {
     if (view === 'month') {
@@ -168,7 +151,7 @@ const Report = () => {
       datasets: [
         {
           data: [presentCount, absentCount],
-          backgroundColor: ['#A45EE5', '#757575'], // Updated colors
+          backgroundColor: ['#A45EE5', '#757575'],
         },
       ],
     };
@@ -176,18 +159,38 @@ const Report = () => {
     return <Pie data={data} />;
   };
 
+  // Custom Toggle Component
+  function CustomToggle({ children, eventKey, onClick }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const decoratedOnClick = useAccordionButton(eventKey, () => {
+      setIsOpen(!isOpen);
+      onClick();
+    });
+
+    return (
+      <div className="accordion-header" onClick={decoratedOnClick}>
+        <Button variant="link" className="w-100 d-flex justify-content-between align-items-center p-3">
+          <div className="d-flex align-items-center">
+            <FaUserGraduate className="me-3 text-primary" />
+            <h5 className="mb-0">{children}</h5>
+          </div>
+          {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+        </Button>
+      </div>
+    );
+  }
+
   // Loading and Error States
   if (loading) return <div className="container mt-4">Loading...</div>;
   if (error) return <div className="container mt-4 text-danger">{error}</div>;
 
   return (
     <div className="container mt-4">
-      <h2>Mark Attendance</h2>
+      <h2>Report</h2>
       {message && <div className="alert alert-info">{message}</div>}
 
       <div className="row mb-3">
         <div className="col-md-3">
-          <label htmlFor="dateFilter" className="form-label"><strong>Select Date:</strong></label>
           <Form.Group controlId="dateFilter">
             <DatePicker
               selected={selectedDate}
@@ -199,7 +202,6 @@ const Report = () => {
           </Form.Group>
         </div>
         <div className="col-md-3">
-          <label htmlFor="courseFilter" className="form-label"><strong>Filter by Course:</strong></label>
           <select
             id="courseFilter"
             className="form-select"
@@ -213,7 +215,6 @@ const Report = () => {
           </select>
         </div>
         <div className="col-md-3">
-          <label htmlFor="batchFilter" className="form-label"><strong>Filter by Batch:</strong></label>
           <select
             id="batchFilter"
             className="form-select"
@@ -227,10 +228,10 @@ const Report = () => {
           </select>
         </div>
         <div className="col-md-3">
-          <h4>Summary for {moment(selectedDate).format('YYYY-MM-DD')}:</h4>
+          <h4>{moment(selectedDate).format('YYYY-MM-DD')}:</h4>
           <p>
-            <span className="badge" style={{ backgroundColor: '#A45EE5' }}>Present: {presentCount}</span>
-            <span className="badge ms-2" style={{ backgroundColor: '#757575' }}>Absent: {absentCount}</span>
+            <span className="badge" style={{ color : 'white' , backgroundColor: '#A45EE5' }}>Present: {presentCount}</span>
+            <span className="badge ms-2" style={{ color : 'white' ,  backgroundColor: '#757575' }}>Absent: {absentCount}</span>
           </p>
         </div>
       </div>
@@ -238,11 +239,9 @@ const Report = () => {
       <Accordion>
         {filteredStudents.map((student, index) => (
           <div key={student._id}>
-           
-              <CustomToggle className eventKey={index.toString()} onClick={() => setSelectedStudent(student._id)}>
-                {student.name}
-              </CustomToggle>
-           
+            <CustomToggle eventKey={index.toString()} onClick={() => setSelectedStudent(student._id)}>
+              {student.name}
+            </CustomToggle>
             <Accordion.Collapse eventKey={index.toString()}>
               <Card.Body>
                 <div className="row">
@@ -265,6 +264,7 @@ const Report = () => {
                     </p>
                   </div>
                   <div className="col-md-4">
+                    <h5>Attendance Pie Chart for {student.name} ({selectedMonth}):</h5>
                     {renderPieChart(student._id, selectedMonth)}
                   </div>
                 </div>

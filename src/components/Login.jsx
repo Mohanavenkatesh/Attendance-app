@@ -1,14 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Modal from './Model'; // Import the Modal component
-import Logo from '../img/logo.png'; // ILogo
+import Logo from '../img/logo.png'; // Logo
 import person1 from '../img/character-1.png'; // Person 1
 import person2 from '../img/character-2.png'; // Person 2
 import '../css/Login.css'; // Import the Login.css file
 import Vector from '../img/Vector.png';
-
 
 const Login = ({ setIsAuthenticated }) => {
     const [formData, setFormData] = useState({
@@ -17,12 +15,9 @@ const Login = ({ setIsAuthenticated }) => {
         rememberMe: false,
     });
 
-    const [error, setError] = useState('');
-    const [errors, setErrors] = useState({
-        email: '',
-        password: '',
-    });
-    const [modal, setModal] = useState({ show: false, message: '' });
+    const [modal, setModal] = useState({ show: false, message: '' }); // Modal state
+    const [emailError, setEmailError] = useState(''); // Email error state
+    const [passwordError, setPasswordError] = useState(''); // Password error state
     const [loading, setLoading] = useState(false); // Loading state
 
     const navigate = useNavigate();
@@ -46,34 +41,38 @@ const Login = ({ setIsAuthenticated }) => {
     }, [setIsAuthenticated, navigate]);
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
-            [name]: type === 'checkbox' ? checked : value,
+            [e.target.name]: e.target.value,
         });
 
-        setErrors({
-            ...errors,
-            [name]: '',
-        });
+        // Clear errors when user starts typing
+        if (e.target.name === 'email') {
+            setEmailError('');
+        }
+        if (e.target.name === 'password') {
+            setPasswordError('');
+        }
     };
 
     const validateForm = () => {
         const { email, password } = formData;
-        const newErrors = {};
+        let isValid = true;
 
+        // Validate email
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailPattern.test(email)) {
-            newErrors.email = 'Please enter a valid email address!';
+            setEmailError('Please enter a valid email address!');
+            isValid = false;
         }
 
-        if (!password.trim()) {
-            newErrors.password = 'Please enter a password!';
+        // Validate password
+        if (!password) {
+            setPasswordError('Please enter a password!');
+            isValid = false;
         }
 
-        setErrors(newErrors);
-
-        return Object.keys(newErrors).length === 0;
+        return isValid;
     };
 
     const handleSubmit = async (e) => {
@@ -109,56 +108,45 @@ const Login = ({ setIsAuthenticated }) => {
             setTimeout(() => {
                 setModal({ show: false, message: '' });
                 navigate('/dashboard');
-            }, 0.1000);
+            }, 2000);
         } catch (err) {
             console.error(err);
-            setError('Invalid email or password');
+            setModal({ show: true, message: 'Invalid email or password' });
+            setTimeout(() => setModal({ show: false, message: '' }), 2000); // Close modal after 2 seconds
         } finally {
             setLoading(false); // Stop loading
         }
     };
 
     return (
-
-       
-
         <div className="login-container d-flex flex-column  vh-100">
             <nav className="navbar navbar-light w-100 px-4">
-               <img src={Logo} alt="" />
+                <img src={Logo} alt="" />
                 <div>
-                    <Link to='/Login'><button className="btn btn-light  me-3"style={{
-                        padding: '10px 34px 14px 34px'
-                    }}>Login</button></Link>
-                    <Link to='/Register'><button className="btn button-color" style={{
-                        padding: '10px 34px 14px 34px'
-                    }}>Register</button></Link>
+                    <Link to='/Login'><button className="btn btn-light  me-3" style={{ padding: '10px 34px 14px 34px' }}>Login</button></Link>
+                    <Link to='/Register'><button className="btn button-color" style={{ padding: '10px 34px 14px 34px' }}>Register</button></Link>
                 </div>
             </nav>
-           
 
             <div className='d-flex align-items-center justify-content-center flex-grow-1 '>
                 <div className='vector1'>
-                <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
                 </div>
                 <div className='vector2'>
-                <img src={Vector} alt="Vector" className="Vector" style={{ width: '80px', height: '60px' }} />
                 </div>
-                            <img src={person1} className='person1' alt="" />
-                         
+                <img src={person1} className='person1' alt="" />
+
                 <div className="login-card position-relative">
                     <div className="hands-left"></div>
                     <div className="hands-right"></div>
                     <div>
-                        <div className="maincard shadow text-center" >
+                        <div className="maincard shadow text-center">
                             <h2 className="sign mb-5">Sign in to your account</h2>
-
-                            {error && <div className="alert alert-danger">{error}</div>}
 
                             <form onSubmit={handleSubmit} noValidate>
                                 <div className="name mb-3">
                                     <input
                                         type="email"
-                                        className={`form-control ${errors.email ? 'is-invalid' : ''}p-3`}
+                                        className={`form-control ${emailError ? 'is-invalid' : ''} p-3`}
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
@@ -166,17 +154,17 @@ const Login = ({ setIsAuthenticated }) => {
                                         required
                                         autoComplete="username"
                                     />
-                                    {errors.email && (
-                                        <div className="text-danger text-start mt-1" style={{ fontSize: '0.875rem' }}>
-                                            {errors.email}
+                                    {emailError && (
+                                        <div className="invalid-feedback text-start mt-1" style={{ fontSize: '0.875rem' }}>
+                                            {emailError}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className=" name mb-3">
+                                <div className="name mb-3">
                                     <input
                                         type="password"
-                                        className={`form-control ${errors.password ? 'is-invalid' : ''}p-3`}
+                                        className={`form-control ${passwordError ? 'is-invalid' : ''} p-3`}
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
@@ -184,15 +172,15 @@ const Login = ({ setIsAuthenticated }) => {
                                         required
                                         autoComplete="current-password"
                                     />
-                                    {errors.password && (
-                                        <div className="text-danger text-start mt-1" style={{ fontSize: '0.875rem' }}>
-                                            {errors.password}
+                                    {passwordError && (
+                                        <div className="invalid-feedback text-start mt-1" style={{ fontSize: '0.875rem' }}>
+                                            {passwordError}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="d-flex justify-content-between align-items-center mb-3 ">
-                                    <div className='remember mt-4 d-flex gap-1' style={{}}>
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <div className='remember mt-4 d-flex gap-1'>
                                         <input
                                             type="checkbox"
                                             id="remember-me"
@@ -215,18 +203,9 @@ const Login = ({ setIsAuthenticated }) => {
                 <img src={person2} className='person2' alt="" />
             </div>
 
-
-       
             <Modal show={modal.show} message={modal.message} />
         </div>
-
-       
     );
 };
 
 export default Login;
-
-
-
-
-

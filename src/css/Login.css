@@ -1,8 +1,8 @@
 .vector2{
-  position: relative;
+  position: absolute;
   bottom: 200px;
   left: 70px;
-  z-index: 2;
+  z-index:1;
  }
  .forget{
   text-decoration: none;

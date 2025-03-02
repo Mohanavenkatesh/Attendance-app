@@ -3,7 +3,8 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Modal, Button } from 'react-bootstrap';
+import { Modal as BootstrapModal, Button } from "react-bootstrap";
+import Model from "./Model";
 
 const AddAdmission = () => {
   const initialFormData = {
@@ -19,20 +20,20 @@ const AddAdmission = () => {
     batch: "",
     placement: "",
     attendBy: "",
-    date: new Date(), // Add date field
+    preferredSlot: "",
+    date: new Date(),
   };
 
   const [formData, setFormData] = useState(initialFormData);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [errors, setErrors] = useState({}); // State for validation errors
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
-    // Clear the error for the field being edited
+    // Clear error for the modified field
     setErrors({ ...errors, [name]: "" });
   };
 
@@ -40,86 +41,78 @@ const AddAdmission = () => {
     setFormData({ ...formData, date });
   };
 
-  // Validate form fields
   const validateForm = () => {
-    const { name, mobile, email, qualification, parentName, parentMobile, address, course, modeOfLearning, batch, attendBy } = formData;
+    const {
+      name,
+      mobile,
+      email,
+      qualification,
+      parentName,
+      parentMobile,
+      address,
+      course,
+      modeOfLearning,
+      batch,
+      attendBy,
+      preferredSlot,
+      placement,
+    } = formData;
     const newErrors = {};
 
-    // Validate name
     if (!name.trim()) {
       newErrors.name = "Please enter the student's name!";
     }
-
-    // Validate mobile
     const mobilePattern = /^\d{10}$/;
     if (!mobilePattern.test(mobile)) {
       newErrors.mobile = "Please enter a valid 10-digit mobile number!";
     }
-
-    // Validate email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       newErrors.email = "Please enter a valid email address!";
     }
-
-    // Validate qualification
     if (!qualification.trim()) {
       newErrors.qualification = "Please enter the student's qualification!";
     }
-
-    // Validate parent name
     if (!parentName.trim()) {
       newErrors.parentName = "Please enter the parent's name!";
     }
-
-    // Validate parent mobile
     if (!mobilePattern.test(parentMobile)) {
       newErrors.parentMobile = "Please enter a valid 10-digit mobile number!";
     }
-
-    // Validate address
     if (!address.trim()) {
       newErrors.address = "Please enter the student's address!";
     }
-
-    // Validate course
     if (!course) {
       newErrors.course = "Please select a course!";
     }
-
-    // Validate mode of learning
     if (!modeOfLearning) {
       newErrors.modeOfLearning = "Please select a mode of learning!";
     }
-
-    // Validate batch
     if (!batch) {
       newErrors.batch = "Please select a batch!";
     }
-
-    // Validate attendBy
     if (!attendBy) {
       newErrors.attendBy = "Please select who is attending!";
     }
+    if (!preferredSlot) {
+      newErrors.preferredSlot = "Please select a preferred slot!";
+    }
+    if (!placement) {
+      newErrors.placement = "Please select a placement option!";
+    }
 
-    // Set errors if any
     setErrors(newErrors);
-
-    // Return true if no errors
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form before submission
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
-      // Check if the email or mobile already exists
-      const checkResponse = await axios.post("http://localhost:5000/api/admission/check", {
+      // Check for duplicate email or mobile
+      const checkResponse = await axios.post("http://localhost:5000/api/admissions/check", {
         email: formData.email,
         mobile: formData.mobile,
       });
@@ -130,17 +123,16 @@ const AddAdmission = () => {
         return;
       }
 
-      // If no duplicate, submit the form
-      const response = await axios.post("http://localhost:5000/api/admission", formData);
+      // Submit admission form data
+      await axios.post("http://localhost:5000/api/admissions", formData);
       setSuccessMessage("Admission submitted successfully!");
       setErrorMessage("");
       setFormData(initialFormData);
 
-      // Close the form after 2 seconds
+      // Close the form modal immediately after submission
       setTimeout(() => {
         setShowForm(false);
-      }, 0.100);
-
+      }, 0.1);
     } catch (error) {
       console.error(error);
       setErrorMessage(
@@ -158,11 +150,13 @@ const AddAdmission = () => {
           Add Admission
         </button>
       </div>
-      <Modal show={showForm} onHide={() => setShowForm(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Admission</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      
+      {/* Form Modal */}
+      <BootstrapModal show={showForm} onHide={() => setShowForm(false)} centered>
+        <BootstrapModal.Header closeButton className="bg-color">
+          <BootstrapModal.Title>Add Admission</BootstrapModal.Title>
+        </BootstrapModal.Header>
+        <BootstrapModal.Body>
           <form onSubmit={handleSubmit} noValidate>
             <div className="row g-3">
               {/* Name Field */}
@@ -175,7 +169,11 @@ const AddAdmission = () => {
                   onChange={handleChange}
                   className={`form-control ${errors.name ? "is-invalid" : ""}`}
                 />
-                {errors.name && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.name}</div>}
+                {errors.name && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.name}
+                  </div>
+                )}
               </div>
 
               {/* Mobile Field */}
@@ -188,7 +186,11 @@ const AddAdmission = () => {
                   onChange={handleChange}
                   className={`form-control ${errors.mobile ? "is-invalid" : ""}`}
                 />
-                {errors.mobile && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.mobile}</div>}
+                {errors.mobile && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.mobile}
+                  </div>
+                )}
               </div>
 
               {/* Email Field */}
@@ -201,7 +203,11 @@ const AddAdmission = () => {
                   onChange={handleChange}
                   className={`form-control ${errors.email ? "is-invalid" : ""}`}
                 />
-                {errors.email && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.email}</div>}
+                {errors.email && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.email}
+                  </div>
+                )}
               </div>
 
               {/* Qualification Field */}
@@ -214,7 +220,11 @@ const AddAdmission = () => {
                   onChange={handleChange}
                   className={`form-control ${errors.qualification ? "is-invalid" : ""}`}
                 />
-                {errors.qualification && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.qualification}</div>}
+                {errors.qualification && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.qualification}
+                  </div>
+                )}
               </div>
 
               {/* Parent Name Field */}
@@ -227,7 +237,11 @@ const AddAdmission = () => {
                   onChange={handleChange}
                   className={`form-control ${errors.parentName ? "is-invalid" : ""}`}
                 />
-                {errors.parentName && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.parentName}</div>}
+                {errors.parentName && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.parentName}
+                  </div>
+                )}
               </div>
 
               {/* Parent Mobile Field */}
@@ -240,7 +254,11 @@ const AddAdmission = () => {
                   onChange={handleChange}
                   className={`form-control ${errors.parentMobile ? "is-invalid" : ""}`}
                 />
-                {errors.parentMobile && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.parentMobile}</div>}
+                {errors.parentMobile && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.parentMobile}
+                  </div>
+                )}
               </div>
 
               {/* Address Field */}
@@ -253,7 +271,11 @@ const AddAdmission = () => {
                   onChange={handleChange}
                   className={`form-control ${errors.address ? "is-invalid" : ""}`}
                 />
-                {errors.address && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.address}</div>}
+                {errors.address && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.address}
+                  </div>
+                )}
               </div>
 
               {/* Course Field */}
@@ -275,7 +297,11 @@ const AddAdmission = () => {
                   <option value="Machine Learning">Machine Learning</option>
                   <option value="App Development">App Development</option>
                 </select>
-                {errors.course && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.course}</div>}
+                {errors.course && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.course}
+                  </div>
+                )}
               </div>
 
               {/* Mode of Learning Field */}
@@ -290,7 +316,11 @@ const AddAdmission = () => {
                   <option value="online">Online</option>
                   <option value="offline">Offline</option>
                 </select>
-                {errors.modeOfLearning && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.modeOfLearning}</div>}
+                {errors.modeOfLearning && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.modeOfLearning}
+                  </div>
+                )}
               </div>
 
               {/* Batch Field */}
@@ -309,7 +339,11 @@ const AddAdmission = () => {
                   <option value="5.30">5.30</option>
                   <option value="1.30">1.30</option>
                 </select>
-                {errors.batch && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.batch}</div>}
+                {errors.batch && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.batch}
+                  </div>
+                )}
               </div>
 
               {/* AttendBy Field */}
@@ -324,7 +358,50 @@ const AddAdmission = () => {
                   <option value="self">Self</option>
                   <option value="guardian">Guardian</option>
                 </select>
-                {errors.attendBy && <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>{errors.attendBy}</div>}
+                {errors.attendBy && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.attendBy}
+                  </div>
+                )}
+              </div>
+
+              {/* Preferred Slot Field */}
+              <div className="col-md-6">
+                <select
+                  name="preferredSlot"
+                  value={formData.preferredSlot}
+                  onChange={handleChange}
+                  className={`form-select ${errors.preferredSlot ? "is-invalid" : ""}`}
+                >
+                  <option value="">Select preferred slot</option>
+                  <option value="Morning">Morning</option>
+                  <option value="Afternoon">Afternoon</option>
+                  <option value="Evening">Evening</option>
+                </select>
+                {errors.preferredSlot && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.preferredSlot}
+                  </div>
+                )}
+              </div>
+
+              {/* Placement Field */}
+              <div className="col-md-6">
+                <select
+                  name="placement"
+                  value={formData.placement}
+                  onChange={handleChange}
+                  className={`form-select ${errors.placement ? "is-invalid" : ""}`}
+                >
+                  <option value="">Select placement option</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+                {errors.placement && (
+                  <div className="text-danger text-start mt-1" style={{ fontSize: "0.875rem" }}>
+                    {errors.placement}
+                  </div>
+                )}
               </div>
 
               {/* Date Field */}
@@ -339,13 +416,25 @@ const AddAdmission = () => {
               </div>
             </div>
             <div className="text-center mt-4">
-              <button type="submit" className="btn btn-primary px-5 py-2">
+              <button type="submit" className="btn button-color px-5 py-2">
                 Submit Admission
               </button>
             </div>
           </form>
-        </Modal.Body>
-      </Modal>
+        </BootstrapModal.Body>
+      </BootstrapModal>
+
+      {/* Custom pop-up using Model component */}
+      <Model
+        show={!!successMessage}
+        message={successMessage}
+        onClose={() => setSuccessMessage('')}
+      />
+      <Model
+        show={!!errorMessage}
+        message={errorMessage}
+        onClose={() => setErrorMessage('')}
+      />
     </div>
   );
 };

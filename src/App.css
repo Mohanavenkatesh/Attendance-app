@@ -7,7 +7,7 @@
   --text-color: #000000;
   --sidebar-background-color: #ffffff;
   --sidebar-text-color: #000000;
-  --card-background-color: #ffffff;
+  --card-background-color: #f9fbff;
   --card-text-color: #000000;
   --input-background-color: #ffffff;
   --input-text-color: #000000;
@@ -18,9 +18,9 @@
 }
 
 [data-theme='dark'] {
-  --background-color: hsl(0, 0%, 4%);
+  --background-color: #292a2d ;
   --text-color: #ffffff;
-  --sidebar-background-color: hsl(0, 0%, 3%);
+  --sidebar-background-color: #232528;
   --sidebar-text-color: #ffffff;
   --card-background-color: #111111;
   --card-text-color: #ffffff;
@@ -560,6 +560,7 @@ button {
 .modal-content {
   background-color: var(--card-background-color);
   color: var(--card-text-color);
+  
 }
 
 .modal-body {

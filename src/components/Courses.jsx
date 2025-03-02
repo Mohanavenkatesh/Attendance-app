@@ -7,6 +7,7 @@ import book from '../img/book 2.png';
 import bell from '../img/bell 1.png';
 import { Form } from 'react-bootstrap';
 import '../css/Courses.css';
+import Model from './Model';  // Importing our custom Modal
 
 const Courses = () => {
   const [admissions, setAdmissions] = useState([]);
@@ -163,7 +164,7 @@ const Courses = () => {
       {/* Header Section */}
       <div className="d-flex justify-content-between mb-4">
         <div className="d-flex gap-3">
-          <img src={book} className="book" alt="Courses" style={{ height: '30px', width: '30px' }} />
+          <img src={book} className="book" alt="Courses" style={{ height: '30px', width: '30px'  }} />
           <h3 className="course">Courses</h3>
         </div>
         <div>
@@ -181,7 +182,7 @@ const Courses = () => {
             showMonthYearPicker
             className="form-control"
             placeholderText="Select Month"
-            style={{ width: '200px' }}
+            style={{ width: '200px' , }}
           />
           <Form.Group controlId="batchFilter" className="ms-3" style={{ minWidth: '200px' }}>
             <Form.Select
@@ -197,9 +198,17 @@ const Courses = () => {
         </div>
       )}
 
-      {/* Messages */}
-      {successMessage && <div className="alert alert-success">{successMessage}</div>}
-      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+         {/* Pop-up Messages using Model component */}
+         <Model 
+        show={!!successMessage} 
+        message={successMessage} 
+        onClose={() => setSuccessMessage('')} 
+      />
+      <Model 
+        show={!!errorMessage} 
+        message={errorMessage} 
+        onClose={() => setErrorMessage('')} 
+      />
 
       {/* Course Details or Course List */}
       {selectedCourse ? (
@@ -335,7 +344,7 @@ const Courses = () => {
                 onMouseOut={(e) => e.currentTarget.style.transform = 'none'}
               >
                 <div className="card-body d-flex align-items-center justify-content-center">
-                  <h6 className="card-title text-center mb-0 px-2">
+                  <h6 className="card-title text-center mb-0 px-2 text-white">
                     {course}
                   </h6>
                 </div>
