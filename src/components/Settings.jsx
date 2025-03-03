@@ -3,6 +3,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import system from "../img/system.png";
 import light from "../img/light.png";
 import dark from "../img/dark.png";
+import settings from '../img/Settings.png'; // Person 1
+import '../css/Setting.css';
 
 const Settings = ({ setTheme, name, email }) => {
   const [theme, setLocalTheme] = useState("system");
@@ -43,13 +45,17 @@ const Settings = ({ setTheme, name, email }) => {
 
   return (
     <div className="container p-4">
-      <h2 className="mb-4">Settings</h2>
+      <div className="d-flex flex-row justify-content-top align-items-center gap-5  ">
+      <img src={settings} className='settings 'style={{width:'40px'}} alt="" />
+      </div>
+      <h2 className="setting mb-4 d-flex ">Settings</h2>
 
       {/* Theme Settings */}
       <div className="mb-4">
-        <h4>Interface Theme</h4>
-        <p>Select or customize your UI theme</p>
-        <div className="d-flex gap-4 theme-selection">
+        <h4 className="inter ">Interface Theme</h4>
+        <p className=" inter1 mt-3" style={{}}>Select or customize your UI theme</p>
+        <div className="d-flex gap-5 theme-selection">
+          
           {[
             { mode: "system", img: system },
             { mode: "light", img: light },
@@ -62,13 +68,13 @@ const Settings = ({ setTheme, name, email }) => {
                 value={mode}
                 checked={theme === mode}
                 onChange={() => handleThemeChange(mode)}
-                className="me-2"
+                className="me-5"
               />
               <img
                 src={img}
                 alt={mode}
                 className="rounded border theme-img"
-                width="80"
+                width="150"
               />
               <div>{mode.charAt(0).toUpperCase() + mode.slice(1)}</div>
             </label>
@@ -77,16 +83,18 @@ const Settings = ({ setTheme, name, email }) => {
       </div>
 
       {/* Student Notifications */}
-      <div className="mb-4">
-        <h4>Student Notifications</h4>
+      <div className=" mb-4 ">
+        <h4 className="inter mb-4">Student Notifications</h4>
+  
         <input
           type="text"
           placeholder="Type here what you want to tell"
-          className="form-control mb-3"
+          className="student form-control mb-3 p-2"
           value={studentNotification}
           onChange={(e) => setStudentNotification(e.target.value)}
         />
-        <label>Set time to notify students</label>
+        <label className="time" style={{width:''}}>Set time to notify students</label>
+        <br /><br />
         <input
           type="range"
           min="-60"
@@ -94,21 +102,23 @@ const Settings = ({ setTheme, name, email }) => {
           step="10"
           value={studentTime}
           onChange={(e) => setStudentTime(e.target.value)}
-          className="form-range"
+          className="range form-range "
+         
         />
       </div>
 
       {/* System Notifications */}
       <div className="mb-4">
-        <h4>System Notifications</h4>
-        <div className="form-check form-switch">
+        <h4 className="inter">System Notifications</h4>
+        <div className="check form-check form-switch ">
           <input
-            className="form-check-input"
+            className="form-check-input "
             type="checkbox"
             checked={systemNotifications}
             onChange={() => setSystemNotifications(!systemNotifications)}
           />
         </div>
+        <br />
         <input
           type="range"
           min="-60"
@@ -116,15 +126,15 @@ const Settings = ({ setTheme, name, email }) => {
           step="10"
           value={systemTime}
           onChange={(e) => setSystemTime(e.target.value)}
-          className="form-range"
+          className="range form-range "
         />
       </div>
 
       {/* Language Settings */}
-      <div className="mb-4">
-        <h4>Language</h4>
+      {/* <div className="mb-4">
+        <h4 className="inter">Language</h4>
         <select
-          className="form-select"
+          className="form-select w-25"
           value={selectedLanguage}
           onChange={handleLanguageChange}
         >
@@ -134,10 +144,10 @@ const Settings = ({ setTheme, name, email }) => {
           <option value="de">German</option>
           <option value="zh">Chinese</option>
         </select>
-      </div>
+      </div> */}
 
       {/* Account Settings */}
-      <div className="mb-4">
+      {/* <div className="mb-4 w-25">
         <h4>Account Details</h4>
         <form onSubmit={handleAccountUpdate}>
           <div className="mb-3">
@@ -162,9 +172,9 @@ const Settings = ({ setTheme, name, email }) => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary">Update Account</button>
+          <button type="submit" className="btn btn-secondary "  style={{}}>Update Account</button>
         </form>
-      </div>
+      </div> */}
     </div>
   );
 };
