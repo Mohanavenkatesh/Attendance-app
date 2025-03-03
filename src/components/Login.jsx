@@ -108,7 +108,7 @@ const Login = ({ setIsAuthenticated }) => {
             setTimeout(() => {
                 setModal({ show: false, message: '' });
                 navigate('/dashboard');
-            }, 0.100);
+            }, 2000);
         } catch (err) {
             console.error(err);
             setModal({ show: true, message: 'Invalid email or password' });
@@ -116,6 +116,10 @@ const Login = ({ setIsAuthenticated }) => {
         } finally {
             setLoading(false); // Stop loading
         }
+    };
+
+    const handleCloseModal = () => {
+        setModal({ show: false, message: '' });
     };
 
     return (
@@ -203,7 +207,7 @@ const Login = ({ setIsAuthenticated }) => {
                 <img src={person2} className='person2' alt="" />
             </div>
 
-            <Modal show={modal.show} message={modal.message} />
+            <Modal show={modal.show} message={modal.message} onClose={handleCloseModal} />
         </div>
     );
 };
