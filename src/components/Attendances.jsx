@@ -3,10 +3,9 @@ import axios from 'axios';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Container, Row, Col, Card, ListGroup, Button, Badge, Form } from 'react-bootstrap';
-import '../css/Attendance.css'; // Import the CSS file
-import profile from "../img/ix_user-profile-filled.png";
-// import attendance from "../img/User 1.png";
+import { Container, Row, Col, ListGroup, Button, Form } from 'react-bootstrap';
+import { FaUserGraduate } from 'react-icons/fa';  // Imported FontAwesome icon
+import '../css/Attendance.css';
 import bell from "../img/bell 1.png";
 
 const Attendances = () => {
@@ -16,7 +15,7 @@ const Attendances = () => {
   const [batches, setBatches] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState('All');
   const [selectedBatch, setSelectedBatch] = useState('All');
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Use Date object for react-datepicker
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -46,18 +45,14 @@ const Attendances = () => {
     fetchStudents();
   }, []);
 
-  // Update filtered students when selected course or batch changes
   useEffect(() => {
     let filtered = students;
-
     if (selectedCourse !== 'All') {
       filtered = filtered.filter(student => student.course === selectedCourse);
     }
-
     if (selectedBatch !== 'All') {
       filtered = filtered.filter(student => student.batch === selectedBatch);
     }
-
     setFilteredStudents(filtered);
   }, [selectedCourse, selectedBatch, students]);
 
@@ -69,7 +64,6 @@ const Attendances = () => {
           const recordDate = moment(record.date).format('YYYY-MM-DD');
           return recordDate === moment(selectedDate).format('YYYY-MM-DD');
         });
-
         const statusObj = attendanceRecordsForDate.reduce((acc, record) => {
           if (record.studentId && record.studentId._id) {
             const id = record.studentId._id;
@@ -120,28 +114,18 @@ const Attendances = () => {
   return (
     <Container fluid>
       <div className="shadow-sm mb-4">
-
         <div className='d-flex justify-content-between py-2'>
-
-          <div className='d-flex '>
-
-            {/* <img src={attendance} alt="" style={{ width: '50px' }} /> */}
-
+          <div className='d-flex'>
             <p className="ms-2 mt-2">Mark Attendance</p>
-
           </div>
-
-          <img src={bell} alt="" style={{ height: '20px' }} />
-
+          <img src={bell} alt="Notification" style={{ height: '20px' }} />
         </div>
 
         {message && <div className="alert alert-info">{message}</div>}
 
         <Row className="g-3 mb-4">
-
           <Col md={4}>
             <Form.Group controlId="courseFilter">
-
               <Form.Select
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
@@ -166,7 +150,6 @@ const Attendances = () => {
           </Col>
           <Col md={4}>
             <Form.Group controlId="batchFilter">
-
               <Form.Select
                 value={selectedBatch}
                 onChange={(e) => setSelectedBatch(e.target.value)}
@@ -181,14 +164,23 @@ const Attendances = () => {
         </Row>
 
         <div className="mb-">
-          <h4>Student lists</h4>
+          <h4>Student Lists</h4>
         </div>
 
         <ListGroup>
           {filteredStudents.map((student) => (
-            <ListGroup.Item key={student._id} className="d-flex p-2 justify-content-between r align-items-center student-list-item">
-              <div>
-                <img src={profile} className='me-2' />
+            <ListGroup.Item 
+              key={student._id} 
+              className="d-flex p-2 justify-content-between align-items-center student-list-item"
+            >
+              <div className="d-flex align-items-center">
+                <FaUserGraduate 
+                  style={{
+                    fontSize: '40px',
+                    marginRight: '10px',
+                    color: '#6c757d'
+                  }} 
+                />
                 <strong>{student.name}</strong>
               </div>
               <div>
@@ -212,7 +204,6 @@ const Attendances = () => {
             </ListGroup.Item>
           ))}
         </ListGroup>
-
       </div>
     </Container>
   );
