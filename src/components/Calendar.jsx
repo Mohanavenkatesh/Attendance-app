@@ -6,7 +6,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Modal, Button, Alert } from 'react-bootstrap';
+import { Modal, Button, Alert, Row, Col, Form } from 'react-bootstrap';
 
 const localizer = momentLocalizer(moment);
 
@@ -46,11 +46,8 @@ const Calendar = () => {
       try {
         const response = await axios.get('http://localhost:5000/api/admissions');
         const data = response.data;
-
-        // Extract distinct batches and courses
         const batchList = Array.from(new Set(data.map(student => student.batch).filter(Boolean)));
         const courseList = Array.from(new Set(data.map(student => student.course).filter(Boolean)));
-
         setBatches(batchList);
         setCourses(courseList);
       } catch (error) {
@@ -78,8 +75,6 @@ const Calendar = () => {
       };
       setEvents([...events, addedEvent]);
       setNewEvent({ title: '', start: '', end: '', slot: '', batch: '', course: '' });
-
-      // Show success message and close the form
       setSuccessMessage('Event added successfully!');
       setShowForm(false);
       setShowSuccessModal(true);
@@ -105,8 +100,6 @@ const Calendar = () => {
       };
       setEvents(events.map(event => (event.id === updatedEvent.id ? updatedEvent : event)));
       setNewEvent({ title: '', start: '', end: '', slot: '', batch: '', course: '' });
-
-      // Show success message and close the form
       setSuccessMessage('Event updated successfully!');
       setShowForm(false);
       setShowSuccessModal(true);
@@ -121,8 +114,6 @@ const Calendar = () => {
     try {
       await axios.delete(`http://localhost:5000/api/events/${id}`);
       setEvents(events.filter(event => event.id !== id));
-
-      // Show success message
       setSuccessMessage('Event deleted successfully!');
       setShowSuccessModal(true);
       setTimeout(() => setShowSuccessModal(false), 3000);
@@ -147,32 +138,106 @@ const Calendar = () => {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-3 text-center">Calendar</h2>
-      {successMessage && <Alert variant="success">{successMessage}</Alert>}
+      <h2 className="mb-4 text-center">Calendar</h2>
+      {showSuccessModal && (
+        <Alert variant="success" className="text-center">
+          {successMessage}
+        </Alert>
+      )}
+      
       <div className="d-flex justify-content-end mb-3">
-        <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(true)}>
+        <Button variant="secondary" size="sm" onClick={() => setShowForm(true)}>
           Add Event
-        </button>
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <Row className="mb-4">
+        <Col md={6}>
+          <Form.Group controlId="batchFilter">
+            <Form.Label><strong>Filter by Batch:</strong></Form.Label>
+            <Form.Select
+              value={selectedBatch}
+              onChange={(e) => setSelectedBatch(e.target.value)}
+            >
+              <option value="All">All</option>
+              {batches.map((batch, index) => (
+                <option key={index} value={batch}>{batch}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group controlId="courseFilter">
+            <Form.Label><strong>Filter by Course:</strong></Form.Label>
+            <Form.Select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+            >
+              <option value="All">All</option>
+              {courses.map((course, index) => (
+                <option key={index} value={course}>{course}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
+      </Row>
+
+      {/* Calendar */}
+      <div className="mb-4">
+        <BigCalendar
+          localizer={localizer}
+          events={filteredEvents}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 500 }}
+          className="custom-calendar p-2 rounded shadow-sm"
+        />
+      </div>
+
+      {/* Upcoming Events List */}
+      <div className="mt-4">
+        <h3 className="mb-3 text-center">Upcoming Events</h3>
+        <ul className="list-group">
+          {filteredEvents.length ? (
+            filteredEvents.map(event => (
+              <li key={event.id} className="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{event.title}</strong> - {new Date(event.start).toLocaleString()}
+                </div>
+                <div>
+                  <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditClick(event)}>
+                    Edit
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDeleteEvent(event.id)}>
+                    Delete
+                  </Button>
+                </div>
+              </li>
+            ))
+          ) : (
+            <li className="list-group-item text-center">No events found.</li>
+          )}
+        </ul>
       </div>
 
       {/* Add/Edit Event Modal */}
-      <Modal show={showForm} onHide={() => setShowForm(false)} centered>
+      <Modal show={showForm} onHide={() => { setShowForm(false); setEditEvent(null); }} centered>
         <Modal.Header closeButton>
           <Modal.Title>{editEvent ? 'Edit Event' : 'Add Event'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form onSubmit={editEvent ? handleEditEvent : handleAddEvent}>
-            <div className="mb-3">
-              <input
+          <Form onSubmit={editEvent ? handleEditEvent : handleAddEvent}>
+            <Form.Group className="mb-3" controlId="eventTitle">
+              <Form.Control
                 type="text"
-                className="form-control"
                 placeholder="Event Title"
                 value={newEvent.title}
                 onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                 required
               />
-            </div>
-            <div className="mb-3">
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventStart">
               <DatePicker
                 selected={newEvent.start}
                 onChange={(date) => setNewEvent({ ...newEvent, start: date })}
@@ -184,8 +249,8 @@ const Calendar = () => {
                 placeholderText="Start Date & Time"
                 required
               />
-            </div>
-            <div className="mb-3">
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventEnd">
               <DatePicker
                 selected={newEvent.end}
                 onChange={(date) => setNewEvent({ ...newEvent, end: date })}
@@ -197,20 +262,18 @@ const Calendar = () => {
                 placeholderText="End Date & Time"
                 required
               />
-            </div>
-            <div className="mb-3">
-              <input
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventSlot">
+              <Form.Control
                 type="text"
-                className="form-control"
                 placeholder="Slot"
                 value={newEvent.slot}
                 onChange={(e) => setNewEvent({ ...newEvent, slot: e.target.value })}
                 required
               />
-            </div>
-            <div className="mb-3">
-              <select
-                className="form-select"
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventBatch">
+              <Form.Select
                 value={newEvent.batch}
                 onChange={(e) => setNewEvent({ ...newEvent, batch: e.target.value })}
                 required
@@ -219,11 +282,10 @@ const Calendar = () => {
                 {batches.map((batch, index) => (
                   <option key={index} value={batch}>{batch}</option>
                 ))}
-              </select>
-            </div>
-            <div className="mb-3">
-              <select
-                className="form-select"
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="eventCourse">
+              <Form.Select
                 value={newEvent.course}
                 onChange={(e) => setNewEvent({ ...newEvent, course: e.target.value })}
                 required
@@ -232,81 +294,14 @@ const Calendar = () => {
                 {courses.map((course, index) => (
                   <option key={index} value={course}>{course}</option>
                 ))}
-              </select>
-            </div>
-            <Button type="submit" className="btn btn-primary w-100">{editEvent ? 'Update Event' : 'Add Event'}</Button>
-          </form>
+              </Form.Select>
+            </Form.Group>
+            <Button type="submit" variant="primary" className="w-100">
+              {editEvent ? 'Update Event' : 'Add Event'}
+            </Button>
+          </Form>
         </Modal.Body>
       </Modal>
-
-      {/* Success Modal */}
-      <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
-        <Modal.Body>
-          <Alert variant="success" onClose={() => setShowSuccessModal(false)} dismissible>
-            {successMessage}
-          </Alert>
-        </Modal.Body>
-      </Modal>
-
-      {/* Filters */}
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label htmlFor="batchFilter" className="form-label"><strong>Filter by Batch:</strong></label>
-          <select
-            id="batchFilter"
-            className="form-select form-select-sm"
-            value={selectedBatch}
-            onChange={(e) => setSelectedBatch(e.target.value)}
-          >
-            <option value="All">All</option>
-            {batches.map((batch, index) => (
-              <option key={index} value={batch}>{batch}</option>
-            ))}
-          </select>
-        </div>
-        <div className="col-md-6">
-          <label htmlFor="courseFilter" className="form-label"><strong>Filter by Course:</strong></label>
-          <select
-            id="courseFilter"
-            className="form-select form-select-sm"
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-          >
-            <option value="All">All</option>
-            {courses.map((course, index) => (
-              <option key={index} value={course}>{course}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Calendar */}
-      <BigCalendar
-        localizer={localizer}
-        events={filteredEvents}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 300 }}
-        className="custom-calendar p-2 rounded shadow-sm"
-      />
-
-      {/* Upcoming Events List */}
-      <div className="mt-4">
-        <h3 className="mb-3 text-center">Upcoming Events</h3>
-        <ul className="list-group">
-          {filteredEvents.map(event => (
-            <li key={event.id} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-              <div>
-                <strong>{event.title}</strong> - {new Date(event.start).toLocaleString()}
-              </div>
-              <div>
-                <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditClick(event)}>Edit</Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeleteEvent(event.id)}>Delete</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };
