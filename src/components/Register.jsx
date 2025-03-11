@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Modal from './Model'; // Import the Modal component
-import Logo from '../img/logo.png'; // Logo
 import person1 from '../img/character-1.png'; // Person 1
 import person2 from '../img/character-2.png'; // Person 2
 import '../css/Register.css'; // Import the Register.css file
@@ -149,8 +148,7 @@ const Register = () => {
     <div className="register-container d-flex flex-column align-items-center justify-content-center vh-100 position-relative">
       {/* Navbar */}
       <nav className="navbar w-100 px-4 position-absolute top-0 start-0 d-flex justify-content-between">
-        <img src={Logo} alt="" />
-        <div>
+        <p>PresentSir</p>        <div>
           <Link to='/Login'><button className="btn btn-light me-2" style={{ padding: '10px 34px 14px 34px' }}>Login</button></Link>
           <Link to='/Register'><button className="btn button-color" style={{ padding: '10px 34px 14px 34px' }}>Register</button></Link>
         </div>
@@ -175,7 +173,7 @@ const Register = () => {
         <div className="hands-right position-absolute"></div>
         <img src={person1} className='person1' alt="" />
         <div className=" shadow text-center w-100 maincard">
-          <h2 className="sign mb-5">Sign up to your account</h2>
+          <h2 className=" mb-5">Sign up to your account</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-3 d-flex">
               <div className="name w-50 me-2 ">

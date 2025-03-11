@@ -108,7 +108,7 @@ const Login = ({ setIsAuthenticated }) => {
             setTimeout(() => {
                 setModal({ show: false, message: '' });
                 navigate('/dashboard');
-            }, 2000);
+            }, 0.100);
         } catch (err) {
             console.error(err);
             setModal({ show: true, message: 'Invalid email or password' });
@@ -125,8 +125,7 @@ const Login = ({ setIsAuthenticated }) => {
     return (
         <div className="login-container d-flex flex-column  vh-100">
             <nav className="navbar navbar-light w-100 px-4">
-                <img src={Logo} alt="" />
-                <div>
+            <p>PresentSir</p>                  <div>
                     <Link to='/Login'><button className="btn btn-light  me-3" style={{ padding: '10px 34px 14px 34px' }}>Login</button></Link>
                     <Link to='/Register'><button className="btn button-color" style={{ padding: '10px 34px 14px 34px' }}>Register</button></Link>
                 </div>
@@ -144,7 +143,7 @@ const Login = ({ setIsAuthenticated }) => {
                     <div className="hands-right"></div>
                     <div>
                         <div className="maincard shadow text-center">
-                            <h2 className="sign mb-5">Sign in to your account</h2>
+                            <h2 className=" mb-5">Sign in to your account</h2>
 
                             <form onSubmit={handleSubmit} noValidate>
                                 <div className="name mb-3">

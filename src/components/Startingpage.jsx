@@ -2,14 +2,13 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import  amico  from '../img/amico.png';
-import Logo from '../img/logo.png'; // ILogo
 
 export const Startingpage = () => {
   return (
     <div className="container-fluid  vh-100 d-flex flex-column">
       {/* Navbar */}
       <nav className="navbar  px-4">
-       <img src={Logo} alt="" />
+       <p>PresentSir</p>
         <div>
           <Link to='/Login'><button className="btn btn-light border  me-2">Login</button></Link>
           <Link to='/Register'><button className="btn button-color">Register</button></Link>
